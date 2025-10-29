@@ -1,0 +1,36 @@
+.pencil-box-canvas-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.pencil-canvas {
+  display: block;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 3px rgba(255, 255, 255, 0.8);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.pencil-canvas:active {
+  cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+  .pencil-box-canvas-container {
+    padding: 10px;
+  }
+}
+

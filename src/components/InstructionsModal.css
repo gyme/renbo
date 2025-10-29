@@ -1,0 +1,68 @@
+.instructions-modal {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.instructions-content {
+  margin-bottom: 30px;
+}
+
+.instructions-content section {
+  margin-bottom: 25px;
+}
+
+.instructions-content h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instructions-content p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.instructions-content ul {
+  margin: 10px 0;
+  padding-left: 25px;
+}
+
+.instructions-content li {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+.instructions-content strong {
+  color: #333;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .instructions-modal {
+    padding: 30px 20px;
+    max-height: 85vh;
+  }
+
+  .instructions-content h3 {
+    font-size: 18px;
+  }
+
+  .instructions-content p,
+  .instructions-content li {
+    font-size: 14px;
+  }
+}
+
+

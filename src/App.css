@@ -1,0 +1,201 @@
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f5f0e8 0%, #ede7dc 100%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Premium animated background */
+.app::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: none;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes backgroundShift {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.app > *:not(.modal-overlay) {
+  position: relative;
+  z-index: 1;
+}
+
+.app-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  color: #2c3e50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 5px;
+}
+
+.app-logo {
+  height: 120px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.5));
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 20px;
+  opacity: 0.98;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  line-height: 1.4;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 25px;
+  padding: 15px 20px 45px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.game-section {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 20px;
+  color: white;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .app-main {
+    max-width: 100%;
+    padding: 10px 15px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 20px 15px 15px;
+    gap: 14px;
+  }
+  
+  .app-logo {
+    height: 85px;
+  }
+
+  .subtitle {
+    font-size: 17px;
+  }
+
+  .app-main {
+    gap: 18px;
+    padding: 5px 12px 20px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-section,
+.sidebar {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
