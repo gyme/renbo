@@ -3,7 +3,7 @@ import './PencilBoxCanvas.css';
 
 export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = false }) {
   const canvasRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 400, height: 600 });
   const dragStateRef = useRef({
     isDragging: false,
     draggedIndex: -1,
@@ -72,7 +72,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     };
 
     // Scale for drawing
-    const scale = isDragging ? 1.05 : (isFixed ? 0.95 : 1);
+    const scale = isDragging ? 1.05 : 1;
     ctx.translate(x + PENCIL_WIDTH / 2, y + PENCIL_HEIGHT / 2);
     ctx.scale(scale, scale);
     ctx.translate(-PENCIL_WIDTH / 2, -PENCIL_HEIGHT / 2);
@@ -145,33 +145,101 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
       
-      const lockX = capX - 40;
-      const lockY = PENCIL_HEIGHT / 2;
+      // Add a subtle overlay to darken the pencil slightly
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillRect(x, y, PENCIL_WIDTH, PENCIL_HEIGHT);
       
-      // Lock background circle
+      // Add a modern border with rounded corners
+      ctx.strokeStyle = 'rgba(255, 193, 7, 0.9)'; // Amber border
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      // Draw rounded rectangle border
+      const borderPadding = 2;
+      const cornerRadius = 8;
+      const rectX = x + borderPadding;
+      const rectY = y + borderPadding;
+      const rectWidth = PENCIL_WIDTH - borderPadding * 2;
+      const rectHeight = PENCIL_HEIGHT - borderPadding * 2;
+      
       ctx.beginPath();
-      ctx.arc(lockX, lockY, LOCK_ICON_SIZE / 2, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-      ctx.fill();
-      
-      // Lock icon (simplified)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.lineWidth = 2;
-      
-      // Lock shackle
-      ctx.beginPath();
-      ctx.arc(lockX, lockY - 2, 5, Math.PI, 0, false);
+      ctx.moveTo(rectX + cornerRadius, rectY);
+      ctx.lineTo(rectX + rectWidth - cornerRadius, rectY);
+      ctx.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + cornerRadius);
+      ctx.lineTo(rectX + rectWidth, rectY + rectHeight - cornerRadius);
+      ctx.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - cornerRadius, rectY + rectHeight);
+      ctx.lineTo(rectX + cornerRadius, rectY + rectHeight);
+      ctx.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - cornerRadius);
+      ctx.lineTo(rectX, rectY + cornerRadius);
+      ctx.quadraticCurveTo(rectX, rectY, rectX + cornerRadius, rectY);
+      ctx.closePath();
       ctx.stroke();
       
-      // Lock body
-      ctx.fillRect(lockX - 6, lockY - 2, 12, 8);
+      // Add a modern "LOCKED" badge in the top-right corner
+      const badgeX = x + PENCIL_WIDTH - 60;
+      const badgeY = y + 8;
+      const badgeWidth = 50;
+      const badgeHeight = 16;
       
-      // Keyhole
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+      // Badge background with gradient effect
+      const gradient = ctx.createLinearGradient(badgeX, badgeY, badgeX, badgeY + badgeHeight);
+      gradient.addColorStop(0, 'rgba(255, 193, 7, 0.95)');
+      gradient.addColorStop(1, 'rgba(255, 152, 0, 0.95)');
+      
+      ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(lockX, lockY + 1, 2, 0, Math.PI * 2);
+      ctx.moveTo(badgeX + 8, badgeY);
+      ctx.lineTo(badgeX + badgeWidth - 8, badgeY);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + 8);
+      ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - 8);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - 8, badgeY + badgeHeight);
+      ctx.lineTo(badgeX + 8, badgeY + badgeHeight);
+      ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - 8);
+      ctx.lineTo(badgeX, badgeY + 8);
+      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + 8, badgeY);
+      ctx.closePath();
       ctx.fill();
+      
+      // Badge border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(badgeX + 8, badgeY);
+      ctx.lineTo(badgeX + badgeWidth - 8, badgeY);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + 8);
+      ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - 8);
+      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - 8, badgeY + badgeHeight);
+      ctx.lineTo(badgeX + 8, badgeY + badgeHeight);
+      ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - 8);
+      ctx.lineTo(badgeX, badgeY + 8);
+      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + 8, badgeY);
+      ctx.closePath();
+      ctx.stroke();
+      
+      // "LOCKED" text on badge
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.font = 'bold 9px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('LOCKED', badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
+      
+      // Add a subtle diagonal stripe pattern
+      ctx.strokeStyle = 'rgba(255, 193, 7, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const startX = x + (i * 15);
+        const startY = y + PENCIL_HEIGHT;
+        const endX = x + (i * 15) + 20;
+        const endY = y;
+        
+        if (endX < x + PENCIL_WIDTH) {
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+        }
+      }
     }
 
     ctx.restore();
@@ -229,7 +297,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
           // Draw at animated position
           drawX = state.animatingPositions[index].x;
           drawY = state.animatingPositions[index].y;
-          opacity = isFixed ? 0.85 : 1;
+          opacity = 1;
         }
         
         drawPencil(ctx, drawX, drawY, pencil.color, isFixed, isDragging, opacity);
@@ -272,8 +340,8 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         state.offsetY = y - pos.y;
         state.hoverIndex = -1; // Reset hover state
         
-        // Store original positions
-        state.originalPositions = calculatePositions();
+        // Store original positions (actual current positions, not ideal positions)
+        state.originalPositions = state.animatingPositions.map(p => ({ ...p }));
         break;
       }
     }
@@ -291,6 +359,19 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     const y = clientY - rect.top;
 
     state.currentY = y;
+
+    // Only enable hover detection after minimum movement to prevent false triggers
+    const movementThreshold = 10; // pixels
+    const hasMovedEnough = Math.abs(y - state.startY) > movementThreshold;
+    
+    if (!hasMovedEnough) {
+      // Reset hover state if not moved enough
+      if (state.hoverIndex !== -1) {
+        state.hoverIndex = -1;
+        state.targetPositions = [...state.originalPositions];
+      }
+      return;
+    }
 
     // Find which pencil we're hovering over
     const draggedY = y - state.offsetY + PENCIL_HEIGHT / 2;
@@ -412,7 +493,17 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         // Insert the dragged pencil at the hovered position
         newOrder.splice(state.hoverIndex, 0, draggedPencil);
         
-        onPencilsReorder(newOrder);
+        // Check if the order actually changed by comparing pencil IDs
+        const hasChanged = pencils.length !== newOrder.length || 
+          pencils.some((pencil, index) => pencil.id !== newOrder[index].id);
+        
+        // Only call onPencilsReorder if there was an actual change
+        if (hasChanged) {
+          console.log('PencilBoxCanvas: Calling onPencilsReorder (hover case)');
+          onPencilsReorder(newOrder);
+        } else {
+          console.log('PencilBoxCanvas: No change detected (hover case)');
+        }
         
         // Update animating positions to match the new order
         const newPositions = calculatePositions();
@@ -423,18 +514,29 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         const draggedY = state.currentY - state.offsetY + PENCIL_HEIGHT / 2;
         let newIndex = draggedIndex;
 
-        // Find insertion point
-        for (let i = 0; i < pencils.length - 1; i++) {
-          if (i === draggedIndex) continue;
-          
-          const pos = state.originalPositions[i];
-          const midY = pos.y + PENCIL_HEIGHT / 2;
-          
-          if (draggedY < midY) {
-            newIndex = i;
-            break;
-          } else if (i === pencils.length - 2) {
-            newIndex = i;
+        // Check if we're close to the original position (within tolerance)
+        const originalPos = state.originalPositions[draggedIndex];
+        const originalMidY = originalPos.y + PENCIL_HEIGHT / 2;
+        const positionTolerance = 20; // pixels
+        
+        if (Math.abs(draggedY - originalMidY) < positionTolerance) {
+          // Close to original position, keep it there
+          newIndex = draggedIndex;
+          console.log('PencilBoxCanvas: Returning to original position');
+        } else {
+          // Find insertion point
+          for (let i = 0; i < pencils.length - 1; i++) {
+            if (i === draggedIndex) continue;
+            
+            const pos = state.originalPositions[i];
+            const midY = pos.y + PENCIL_HEIGHT / 2;
+            
+            if (draggedY < midY) {
+              newIndex = i;
+              break;
+            } else if (i === pencils.length - 2) {
+              newIndex = i;
+            }
           }
         }
 
@@ -443,7 +545,18 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
           const newOrder = [...pencils];
           const [dragged] = newOrder.splice(draggedIndex, 1);
           newOrder.splice(newIndex, 0, dragged);
-          onPencilsReorder(newOrder);
+          
+          // Check if the order actually changed by comparing pencil IDs
+          const hasChanged = pencils.length !== newOrder.length || 
+            pencils.some((pencil, index) => pencil.id !== newOrder[index].id);
+          
+          // Only call onPencilsReorder if there was an actual change
+          if (hasChanged) {
+            console.log('PencilBoxCanvas: Calling onPencilsReorder (empty space case)');
+            onPencilsReorder(newOrder);
+          } else {
+            console.log('PencilBoxCanvas: No change detected (empty space case)');
+          }
           
           // Update animating positions to match the new order
           const newPositions = calculatePositions();
@@ -478,6 +591,9 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
 
     // Simple hover detection
     let canDrag = false;
+    let isOverLocked = false;
+    
+    // Check draggable pencils
     for (let i = 0; i < pencils.length - 1; i++) { // Exclude last (fixed) pencil
       const pos = state.animatingPositions[i];
       if (y >= pos.y && y <= pos.y + PENCIL_HEIGHT) {
@@ -485,9 +601,24 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         break;
       }
     }
+    
+    // Check if hovering over locked pencil
+    if (!canDrag && pencils.length > 0) {
+      const lastPencilIndex = pencils.length - 1;
+      const pos = state.animatingPositions[lastPencilIndex];
+      if (y >= pos.y && y <= pos.y + PENCIL_HEIGHT) {
+        isOverLocked = true;
+      }
+    }
 
     // Update cursor
-    canvas.style.cursor = canDrag ? 'grab' : 'default';
+    if (canDrag) {
+      canvas.style.cursor = 'grab';
+    } else if (isOverLocked) {
+      canvas.style.cursor = 'not-allowed';
+    } else {
+      canvas.style.cursor = 'default';
+    }
   }, [disabled, pencils, handlePointerMove]);
 
   // Set up canvas size
@@ -495,7 +626,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     const updateSize = () => {
       const container = canvasRef.current?.parentElement;
       if (container) {
-        const width = Math.min(container.clientWidth, 800);
+        const width = Math.min(container.clientWidth, 400);
         // Dynamic height based on number of pencils
         const totalPencilHeight = pencils.length * PENCIL_HEIGHT;
         const totalSpacing = Math.max(0, (pencils.length - 1) * PENCIL_SPACING);

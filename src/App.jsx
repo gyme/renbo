@@ -59,14 +59,34 @@ function App() {
   }
 
   function handlePencilsReorder(newOrder) {
+    console.log('handlePencilsReorder called');
+    console.log('Current pencils:', pencils.map(p => p.id));
+    console.log('New order:', newOrder.map(p => p.id));
+    
     // Ensure the darkest pencil (last one) stays at the bottom
     const darkestPencil = newOrder[newOrder.length - 1];
     const otherPencils = newOrder.slice(0, -1);
     
     // Reconstruct with darkest always last
     const finalOrder = [...otherPencils, darkestPencil];
-    setPencils(finalOrder);
-    setMoveCount(moveCount + 1);
+    
+    console.log('Final order:', finalOrder.map(p => p.id));
+    
+    // Check if the order actually changed by comparing pencil IDs
+    const hasChanged = pencils.length !== finalOrder.length || 
+      pencils.some((pencil, index) => pencil.id !== finalOrder[index].id);
+    
+    console.log('Has changed:', hasChanged);
+    console.log('Current move count:', moveCount);
+    
+    // Only update state and increment move count if there was an actual change
+    if (hasChanged) {
+      setPencils(finalOrder);
+      setMoveCount(prevCount => {
+        console.log('Incrementing move count from', prevCount, 'to', prevCount + 1);
+        return prevCount + 1;
+      });
+    }
   }
 
   function handleSubmit() {
