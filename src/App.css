@@ -47,7 +47,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -106,8 +106,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 25px;
-  padding: 15px 20px 45px;
+  gap: 8px;
+  padding: 5px 20px 45px;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -135,6 +135,19 @@
   margin: 0;
 }
 
+/* Desktop spacing optimization */
+@media (min-width: 1025px) {
+  .app-main {
+    gap: 5px;
+    padding: 0 20px 45px;
+  }
+  
+  .app-header {
+    gap: 8px;
+    padding: 30px 20px 15px;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .app-main {
@@ -158,7 +171,7 @@
   }
 
   .app-main {
-    gap: 18px;
+    gap: 12px;
     padding: 5px 12px 20px;
   }
 }

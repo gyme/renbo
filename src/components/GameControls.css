@@ -2,45 +2,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
   width: 100%;
-  max-width: 900px;
+  max-width: 400px;
   margin: 0 auto;
+  padding: 0;
 }
 
-.controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 12px;
   width: 100%;
-}
-
-.level-moves-container {
-  display: flex;
-  gap: 14px;
-  align-items: stretch;
-  flex-shrink: 0;
+  align-items: center;
 }
 
 .level-badge,
 .moves-badge {
   background: white;
   backdrop-filter: none;
-  border-radius: 24px;
-  padding: 14px 28px;
+  border-radius: 20px;
+  padding: 16px 20px;
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.08);
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 110px;
-  height: auto;
-  border: none;
-  animation: none;
+  height: 70px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.level-badge:hover,
+.moves-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 25px rgba(0, 0, 0, 0.12),
+    0 3px 12px rgba(0, 0, 0, 0.06);
 }
 
 @keyframes badgeFloat {
@@ -53,29 +54,23 @@
 }
 
 .badge-label {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #666;
-  font-weight: 700;
-  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  color: #888;
+  font-weight: 600;
+  margin-bottom: 6px;
   line-height: 1;
 }
 
 .badge-value {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 800;
   color: #2c3e50;
   line-height: 1;
   text-shadow: none;
 }
 
-.action-buttons-inline {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  flex-shrink: 0;
-}
 
 .btn-icon {
   border: none;
@@ -184,25 +179,28 @@
 }
 
 .btn-done {
-  background: linear-gradient(135deg, #FDB750 0%, #FFA726 100%);
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
   color: white;
-  padding: 0 48px;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
+  padding: 0 32px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
   box-shadow: 
-    0 8px 24px rgba(253, 183, 80, 0.4),
-    0 4px 12px rgba(253, 183, 80, 0.3);
-  height: 64px;
-  border-radius: 32px;
+    0 6px 20px rgba(255, 107, 53, 0.3),
+    0 3px 10px rgba(255, 107, 53, 0.2);
+  height: 70px;
+  border-radius: 20px;
   animation: none;
+  border: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-done:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 
-    0 12px 32px rgba(253, 183, 80, 0.5),
-    0 6px 16px rgba(253, 183, 80, 0.4);
+    0 10px 30px rgba(255, 107, 53, 0.4),
+    0 5px 15px rgba(255, 107, 53, 0.3);
   animation: none;
 }
 
@@ -232,57 +230,64 @@
   line-height: 1;
 }
 
-@media (max-width: 1200px) {
-  .controls-row {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
 @media (max-width: 768px) {
   .game-controls {
-    gap: 15px;
+    max-width: 400px;
+    padding: 0 16px;
   }
   
-  .controls-row {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .level-moves-container {
-    justify-content: center;
-  }
-
-  .action-buttons-inline {
-    justify-content: center;
-  }
-
-  .btn-elegant {
-    padding: 0 24px;
-    font-size: 15px;
-    height: 46px;
+  .controls-grid {
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 8px;
   }
 
   .btn-done {
-    padding: 0 32px;
-    font-size: 16px;
-    height: 50px;
-  }
-
-  .btn-help-icon {
-    width: 46px;
-    height: 46px;
-    font-size: 20px;
+    height: 60px;
+    font-size: 14px;
+    padding: 0 16px;
   }
 
   .level-badge,
   .moves-badge {
-    min-width: 75px;
-    padding: 10px 16px;
-    height: 66px;
+    height: 60px;
+    padding: 8px 12px;
   }
 
   .badge-value {
-    font-size: 24px;
+    font-size: 20px;
+  }
+
+  .badge-label {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-controls {
+    padding: 0 12px;
+  }
+  
+  .controls-grid {
+    gap: 6px;
+  }
+
+  .level-badge,
+  .moves-badge {
+    height: 55px;
+    padding: 6px 8px;
+  }
+
+  .badge-value {
+    font-size: 18px;
+  }
+
+  .badge-label {
+    font-size: 8px;
+  }
+
+  .btn-done {
+    height: 55px;
+    font-size: 13px;
+    padding: 0 12px;
   }
 }

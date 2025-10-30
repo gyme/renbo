@@ -173,9 +173,6 @@ function App() {
         onClose={() => setShowInstructions(false)}
       />
 
-      <footer className="app-footer">
-        <p>Made with ❤️ for color enthusiasts</p>
-      </footer>
     </div>
   );
 }
