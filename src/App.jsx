@@ -6,11 +6,11 @@ import GameControls from './components/GameControls';
 import InstructionsModal from './components/InstructionsModal';
 import { generatePencils, sortPencils } from './utils/colorUtils';
 import { calculateScore, calculatePercentile } from './utils/scoreUtils';
-import { saveScore, getLeaderboard } from './utils/storageUtils';
+import { saveScore, getLeaderboard, saveCurrentLevel, getCurrentLevel } from './utils/storageUtils';
 import './App.css';
 
 function App() {
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState(() => getCurrentLevel());
   const [pencils, setPencils] = useState([]);
   const [idealOrder, setIdealOrder] = useState([]);
   const [showScoreModal, setShowScoreModal] = useState(false);
@@ -27,6 +27,11 @@ function App() {
   // Load leaderboard
   useEffect(() => {
     setLeaderboard(getLeaderboard(level));
+  }, [level]);
+
+  // Save level to localStorage whenever it changes
+  useEffect(() => {
+    saveCurrentLevel(level);
   }, [level]);
 
   function initializeLevel(lvl) {
