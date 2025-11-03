@@ -31,11 +31,14 @@
 @media (max-width: 768px) {
   .pencil-box-canvas-container {
     padding: 10px;
-    /* Fixed height for mobile - fills remaining viewport */
-    /* Calculate: viewport height minus header (approximately 200px) */
-    height: calc(100vh - 180px);
-    min-height: 400px;
-    max-height: calc(100vh - 180px);
+    /* Fill exactly the remaining viewport space */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 0;
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -49,9 +52,14 @@
     display: none; /* Chrome, Safari, Opera */
   }
   
-  /* Ensure canvas can be taller than container for scrolling */
+  /* Ensure canvas maintains its natural size and can be taller than container for scrolling */
+  /* Canvas should not be constrained by container height - it can be taller */
   .pencil-canvas {
-    min-height: 100%;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    /* Height is set by JavaScript based on pencil count - don't constrain it */
   }
 }
 

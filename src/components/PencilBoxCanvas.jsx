@@ -647,8 +647,11 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     const updateSize = () => {
       const container = canvasRef.current?.parentElement;
       if (container) {
-        const width = Math.min(container.clientWidth, 400);
-        // Dynamic height based on number of pencils
+        // Width is constrained by container or max 400px
+        const width = Math.min(container.clientWidth - 20, 400); // Account for padding
+        
+        // Dynamic height based on number of pencils - always full size
+        // This ensures pencils are never compressed, container will scroll
         const totalPencilHeight = pencils.length * PENCIL_HEIGHT;
         const totalSpacing = Math.max(0, (pencils.length - 1) * PENCIL_SPACING);
         const padding = 40; // Top and bottom padding
