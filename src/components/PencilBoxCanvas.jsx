@@ -3,6 +3,7 @@ import './PencilBoxCanvas.css';
 
 export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = false }) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 400, height: 600 });
   const dragStateRef = useRef({
     isDragging: false,
@@ -15,6 +16,8 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     animatingPositions: [],
     hoverIndex: -1, // Track which pencil is being hovered over
     originalPositions: [], // Store original positions when drag starts
+    lastScrollY: 0, // Track last touch Y position for scroll calculation
+    containerRef: null, // Reference to scrollable container
   });
 
   const PENCIL_HEIGHT = 40;
@@ -320,11 +323,10 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
   const handlePointerDown = useCallback((e) => {
     if (disabled) return;
 
-    e.preventDefault();
-
+    const isTouch = e.touches !== undefined;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
     const y = clientY - rect.top;
 
     const state = dragStateRef.current;
@@ -333,12 +335,25 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     for (let i = 0; i < pencils.length - 1; i++) { // Exclude last (fixed) pencil
       const pos = state.animatingPositions[i];
       if (y >= pos.y && y <= pos.y + PENCIL_HEIGHT) {
+        // For mouse, prevent default to enable drag
+        // For touch, we'll handle it in move to allow scroll
+        if (!isTouch) {
+          e.preventDefault();
+        }
+        
         state.isDragging = true;
         state.draggedIndex = i;
         state.startY = y;
         state.currentY = y;
         state.offsetY = y - pos.y;
         state.hoverIndex = -1; // Reset hover state
+        
+        // Initialize scroll tracking for touch devices
+        if (isTouch) {
+          state.lastScrollY = clientY;
+        } else {
+          state.lastScrollY = 0;
+        }
         
         // Store original positions (actual current positions, not ideal positions)
         state.originalPositions = state.animatingPositions.map(p => ({ ...p }));
@@ -351,12 +366,46 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     const state = dragStateRef.current;
     if (!state.isDragging) return;
 
-    e.preventDefault();
-
+    const isTouch = e.touches !== undefined;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
     const y = clientY - rect.top;
+
+    // Handle scrolling on mobile (touch devices) - scroll the canvas container
+    // When dragging down (clientY increases), scroll container down
+    // When dragging up (clientY decreases), scroll container up
+    if (isTouch && state.lastScrollY !== 0) {
+      const scrollDelta = clientY - state.lastScrollY;
+      
+      // Make scrolling gentler by reducing sensitivity (multiply by 0.5)
+      const gentleScrollDelta = scrollDelta * 0.5;
+      
+      // Scroll in the same direction as drag movement
+      // Positive scrollDelta (dragging down) → scroll container down
+      // Negative scrollDelta (dragging up) → scroll container up
+      if (Math.abs(gentleScrollDelta) > 0.1) {
+        const container = containerRef.current;
+        if (container) {
+          // Get current scroll position of the container
+          const currentScrollTop = container.scrollTop || 0;
+          
+          // Calculate new scroll position
+          const newScrollTop = Math.max(0, currentScrollTop + gentleScrollDelta);
+          
+          // Scroll the container
+          container.scrollTop = newScrollTop;
+        }
+      }
+      
+      // Update last scroll position immediately for next calculation
+      state.lastScrollY = clientY;
+    }
+
+    // Only prevent default for mouse (touch events are handled with non-passive listeners)
+    if (!isTouch) {
+      e.preventDefault();
+    }
 
     state.currentY = y;
 
@@ -377,9 +426,6 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     const draggedY = y - state.offsetY + PENCIL_HEIGHT / 2;
     let hoverIndex = -1;
 
-    console.log('Checking hover at draggedY:', draggedY);
-    console.log('Original positions for hover check:', state.originalPositions.map((pos, i) => `Pencil ${i}: y=${pos.y} to y=${pos.y + PENCIL_HEIGHT}`));
-
     for (let i = 0; i < pencils.length - 1; i++) { // Exclude last (fixed) pencil
       if (i === state.draggedIndex) continue; // Skip the dragged pencil itself
       
@@ -388,34 +434,21 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
       // Check if cursor is within the pencil bounds using original positions
       if (draggedY >= pos.y && draggedY <= pos.y + PENCIL_HEIGHT) {
         hoverIndex = i;
-        console.log(`Found hover match at pencil ${i}`);
         break; // Take the first match
       }
     }
-    
-    console.log('Final hoverIndex:', hoverIndex);
 
     // Update hover state - show visual shift of all pencils
-    console.log('Current hoverIndex:', state.hoverIndex, 'New hoverIndex:', hoverIndex);
     if (hoverIndex !== state.hoverIndex) {
-      console.log('Hover state changed! Updating...');
       state.hoverIndex = hoverIndex;
       
       if (hoverIndex !== -1) {
         // Always use original positions as the base for consistent calculations
         const newTargetPositions = [...state.originalPositions];
         
-        console.log('Hover detected:', hoverIndex, 'draggedIndex:', state.draggedIndex);
-        console.log('Current positions:', state.animatingPositions.map((pos, i) => `Pencil ${i}: y=${pos.y}`));
-        console.log('Original positions:', state.originalPositions.map((pos, i) => `Pencil ${i}: y=${pos.y}`));
-        
         // Proper shifting logic: move pencils to create space at hovered position
-        console.log('Creating space at hovered position', hoverIndex);
-        
         if (hoverIndex < state.draggedIndex) {
           // Hovering above dragged pencil - shift pencils down to create space above
-          console.log('Hovering ABOVE - shifting pencils down');
-          
           // All pencils from hoverIndex to draggedIndex-1 shift down by one position
           for (let i = hoverIndex; i < state.draggedIndex; i++) {
             // Calculate new position based on spacing formula
@@ -425,13 +458,10 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
               ...newTargetPositions[i],
               y: newY
             };
-            console.log(`Pencil ${i} shifts down to y=${newY}`);
           }
           
         } else if (hoverIndex > state.draggedIndex) {
           // Hovering below dragged pencil - shift pencils up to create space below
-          console.log('Hovering BELOW - shifting pencils up');
-          
           // All pencils from draggedIndex+1 to hoverIndex shift up by one position
           for (let i = state.draggedIndex + 1; i <= hoverIndex; i++) {
             // Calculate new position based on spacing formula
@@ -441,7 +471,6 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
               ...newTargetPositions[i],
               y: newY
             };
-            console.log(`Pencil ${i} shifts up to y=${newY}`);
           }
         }
         
@@ -462,8 +491,6 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
             // No need to change anything since we started with originalPositions
           }
         }
-        
-        console.log('Final target positions:', newTargetPositions.map((pos, i) => `Pencil ${i}: y=${pos.y}`));
                 
         state.targetPositions = newTargetPositions;
       } else {
@@ -478,6 +505,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     if (!state.isDragging) return;
 
     state.isDragging = false;
+    state.lastScrollY = 0; // Reset scroll tracking
 
     // Handle drop - replacement only happens here
     const draggedIndex = state.draggedIndex;
@@ -499,10 +527,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         
         // Only call onPencilsReorder if there was an actual change
         if (hasChanged) {
-          console.log('PencilBoxCanvas: Calling onPencilsReorder (hover case)');
           onPencilsReorder(newOrder);
-        } else {
-          console.log('PencilBoxCanvas: No change detected (hover case)');
         }
         
         // Update animating positions to match the new order
@@ -522,7 +547,6 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         if (Math.abs(draggedY - originalMidY) < positionTolerance) {
           // Close to original position, keep it there
           newIndex = draggedIndex;
-          console.log('PencilBoxCanvas: Returning to original position');
         } else {
           // Find insertion point
           for (let i = 0; i < pencils.length - 1; i++) {
@@ -552,10 +576,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
           
           // Only call onPencilsReorder if there was an actual change
           if (hasChanged) {
-            console.log('PencilBoxCanvas: Calling onPencilsReorder (empty space case)');
             onPencilsReorder(newOrder);
-          } else {
-            console.log('PencilBoxCanvas: No change detected (empty space case)');
           }
           
           // Update animating positions to match the new order
@@ -660,8 +681,62 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     ctx.scale(dpr, dpr);
   }, [dimensions]);
 
+  // Store container reference for scrolling
+  useEffect(() => {
+    dragStateRef.current.containerRef = containerRef.current;
+  }, []);
+
+  // Set up non-passive touch event listeners to avoid preventDefault errors
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Use non-passive listeners for touch events to allow preventDefault
+    const touchStartHandler = (e) => {
+      handlePointerDown(e);
+      // Prevent default if we started dragging a pencil
+      if (dragStateRef.current.isDragging) {
+        e.preventDefault();
+      }
+    };
+
+    const touchMoveHandler = (e) => {
+      // Check if we're dragging before calling handler
+      const wasDragging = dragStateRef.current.isDragging;
+      handlePointerMove(e);
+      // Prevent default during drag to control scrolling manually
+      if (dragStateRef.current.isDragging || wasDragging) {
+        e.preventDefault();
+      }
+    };
+
+    const touchEndHandler = (e) => {
+      const wasDragging = dragStateRef.current.isDragging;
+      handlePointerUp(e);
+      if (wasDragging) {
+        e.preventDefault();
+      }
+    };
+
+    // Add non-passive listeners
+    canvas.addEventListener('touchstart', touchStartHandler, { passive: false });
+    canvas.addEventListener('touchmove', touchMoveHandler, { passive: false });
+    canvas.addEventListener('touchend', touchEndHandler, { passive: false });
+    canvas.addEventListener('touchcancel', touchEndHandler, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', touchStartHandler);
+      canvas.removeEventListener('touchmove', touchMoveHandler);
+      canvas.removeEventListener('touchend', touchEndHandler);
+      canvas.removeEventListener('touchcancel', touchEndHandler);
+    };
+  }, [handlePointerDown, handlePointerMove, handlePointerUp]);
+
   return (
-    <div className="pencil-box-canvas-container">
+    <div 
+      ref={containerRef}
+      className="pencil-box-canvas-container"
+    >
       <canvas
         ref={canvasRef}
         className="pencil-canvas"
@@ -669,11 +744,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         onMouseMove={handleMouseMove}
         onMouseUp={handlePointerUp}
         onMouseLeave={handlePointerUp}
-        onTouchStart={handlePointerDown}
-        onTouchMove={handlePointerMove}
-        onTouchEnd={handlePointerUp}
-        onTouchCancel={handlePointerUp}
-        style={{ touchAction: 'none' }}
+        style={{ touchAction: 'pan-y' }}
       />
     </div>
   );

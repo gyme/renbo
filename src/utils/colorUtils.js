@@ -17,16 +17,44 @@ const COLOR_PALETTE = [
   { h: 30, s: 85, l: 35 },    // 8. Orange
   { h: 25, s: 80, l: 28 },    // 9. Darker orange
   { h: 20, s: 75, l: 22 },    // 10. Brown-orange
-  { h: 18, s: 70, l: 18 },    // 11. Brown
-  { h: 15, s: 65, l: 14 },    // 12. Dark brown
-  { h: 10, s: 60, l: 10 },    // 13. Darker brown
-  { h: 0, s: 0, l: 6 },       // 14. Very dark gray/brown
+  { h: 18, s: 75, l: 22 },    // 11. Medium-dark brown
+  { h: 15, s: 70, l: 19 },    // 12. Dark brown
+  { h: 12, s: 65, l: 16 },    // 13. Darker brown
+  { h: 10, s: 60, l: 13 },    // 14. Very dark brown
+  { h: 8, s: 55, l: 11 },      // 15. Darkest brown
   
-  // Extended palette - red/pink spectrum with increased contrast
-  { h: 0, s: 0, l: 3 },       // 15. Very dark gray
-  { h: 0, s: 0, l: 1 },       // 16. Almost black
-  { h: 0, s: 0, l: 0 },       // 17. Near black
-  { h: 0, s: 0, l: 0 },       // 18. Black
+  // Extended mid-dark colors before reaching very dark - with better contrast and more variety
+  { h: 350, s: 70, l: 32 },   // 16. Dark red-brown (brighter for distinction)
+  { h: 340, s: 75, l: 29 },   // 17. Dark rose-brown
+  { h: 330, s: 80, l: 27 },   // 18. Dark pink-brown
+  { h: 320, s: 85, l: 25 },   // 19. Dark magenta-brown
+  { h: 310, s: 90, l: 23 },   // 20. Dark purple-brown
+  { h: 300, s: 95, l: 21 },   // 21. Dark purple
+  { h: 290, s: 100, l: 19 },  // 22. Darker purple
+  { h: 280, s: 100, l: 17 },  // 23. Very dark purple
+  { h: 270, s: 100, l: 16 },  // 24. Deep violet
+  { h: 260, s: 100, l: 15 },  // 25. Deep blue-violet
+  { h: 250, s: 100, l: 14 },  // 26. Deep blue
+  { h: 240, s: 100, l: 13 },  // 27. Dark blue
+  { h: 230, s: 100, l: 12 },  // 28. Darker blue
+  { h: 220, s: 100, l: 11 },  // 29. Very dark blue
+  { h: 210, s: 100, l: 10 },  // 30. Deep navy
+  { h: 200, s: 100, l: 9 },    // 31. Very dark cyan
+  { h: 190, s: 100, l: 8 },   // 32. Very dark teal
+  { h: 180, s: 100, l: 7 },   // 33. Very dark green-cyan
+  { h: 170, s: 100, l: 6 },   // 34. Very dark green
+  { h: 160, s: 100, l: 6 },   // 35. Dark forest green
+  { h: 150, s: 100, l: 5 },   // 36. Very dark green
+  
+  // Final progression to black with better spacing and hue variation
+  { h: 140, s: 100, l: 5 },   // 37. Almost black green
+  { h: 130, s: 100, l: 4 },   // 38. Very dark green-gray
+  { h: 120, s: 80, l: 4 },    // 39. Very dark muted green
+  { h: 0, s: 0, l: 4 },       // 40. Very dark gray
+  { h: 0, s: 0, l: 3 },       // 41. Almost black gray
+  { h: 0, s: 0, l: 2 },       // 42. Near black
+  { h: 0, s: 0, l: 1 },       // 43. Almost black
+  { h: 0, s: 0, l: 0 },       // 44. Black
   { h: 350, s: 20, l: 90 },   // 19. Very light pink
   { h: 340, s: 30, l: 80 },   // 20. Light pink
   { h: 330, s: 40, l: 70 },   // 21. Pink

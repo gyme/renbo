@@ -17,7 +17,7 @@
     0 4px 12px rgba(0, 0, 0, 0.05),
     inset 0 1px 3px rgba(255, 255, 255, 0.8);
   cursor: grab;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -31,6 +31,27 @@
 @media (max-width: 768px) {
   .pencil-box-canvas-container {
     padding: 10px;
+    /* Fixed height for mobile - fills remaining viewport */
+    /* Calculate: viewport height minus header (approximately 200px) */
+    height: calc(100vh - 180px);
+    min-height: 400px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .pencil-box-canvas-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  /* Ensure canvas can be taller than container for scrolling */
+  .pencil-canvas {
+    min-height: 100%;
   }
 }
 

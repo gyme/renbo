@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PencilBoxCanvas from './components/PencilBoxCanvas';
 import ScoreModal from './components/ScoreModal';
 import Leaderboard from './components/Leaderboard';
@@ -17,7 +17,8 @@ function App() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [currentScore, setCurrentScore] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [moveCount, setMoveCount] = useState(0);
+  const [movesLeft, setMovesLeft] = useState(null);
+  const prevMovesLeftRef = useRef(null);
 
   // Initialize game
   useEffect(() => {
@@ -33,6 +34,20 @@ function App() {
   useEffect(() => {
     saveCurrentLevel(level);
   }, [level]);
+
+  // Auto-submit when moves reach 0 (only if it went from > 0 to 0, not initial load)
+  useEffect(() => {
+    if (movesLeft === 0 && 
+        prevMovesLeftRef.current !== null && 
+        prevMovesLeftRef.current > 0 && 
+        pencils.length > 0 && 
+        !showScoreModal && 
+        idealOrder.length > 0) {
+      handleSubmit();
+    }
+    prevMovesLeftRef.current = movesLeft;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [movesLeft]);
 
   function initializeLevel(lvl) {
     // Level 1 = 5 pencils, Level 2 = 6 pencils, etc.
@@ -58,16 +73,17 @@ function App() {
     const shuffled = [...shuffledOthers, darkestPencil];
     setPencils(shuffled);
     
+    // Calculate average moves needed for this level
+    // Average moves ≈ pencilCount * 1.5 (accounts for sorting complexity)
+    const averageMoves = Math.max(3, Math.ceil(pencilCount * 1.5));
+    setMovesLeft(averageMoves);
+    prevMovesLeftRef.current = averageMoves;
+    
     setShowScoreModal(false);
     setCurrentScore(null);
-    setMoveCount(0);
   }
 
   function handlePencilsReorder(newOrder) {
-    console.log('handlePencilsReorder called');
-    console.log('Current pencils:', pencils.map(p => p.id));
-    console.log('New order:', newOrder.map(p => p.id));
-    
     // Ensure the darkest pencil (last one) stays at the bottom
     const darkestPencil = newOrder[newOrder.length - 1];
     const otherPencils = newOrder.slice(0, -1);
@@ -75,22 +91,14 @@ function App() {
     // Reconstruct with darkest always last
     const finalOrder = [...otherPencils, darkestPencil];
     
-    console.log('Final order:', finalOrder.map(p => p.id));
-    
     // Check if the order actually changed by comparing pencil IDs
     const hasChanged = pencils.length !== finalOrder.length || 
       pencils.some((pencil, index) => pencil.id !== finalOrder[index].id);
     
-    console.log('Has changed:', hasChanged);
-    console.log('Current move count:', moveCount);
-    
-    // Only update state and increment move count if there was an actual change
+    // Only update state and decrement moves left if there was an actual change
     if (hasChanged) {
       setPencils(finalOrder);
-      setMoveCount(prevCount => {
-        console.log('Incrementing move count from', prevCount, 'to', prevCount + 1);
-        return prevCount + 1;
-      });
+      setMovesLeft(prevMoves => Math.max(0, prevMoves - 1));
     }
   }
 
@@ -143,7 +151,7 @@ function App() {
         
         <GameControls
           level={level}
-          moveCount={moveCount}
+          movesLeft={movesLeft}
           onSubmit={handleSubmit}
           onReset={handleReset}
           onShowInstructions={() => setShowInstructions(true)}

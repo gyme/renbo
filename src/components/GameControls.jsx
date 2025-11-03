@@ -3,7 +3,7 @@ import './GameControls.css';
 
 export default function GameControls({ 
   level,
-  moveCount, 
+  movesLeft, 
   onSubmit, 
   onReset,
   onShowInstructions
@@ -17,8 +17,8 @@ export default function GameControls({
         </div>
         
         <div className="moves-badge">
-          <span className="badge-label">Moves</span>
-          <span className="badge-value">{moveCount}</span>
+          <span className="badge-label">Moves Left</span>
+          <span className="badge-value">{movesLeft ?? 0}</span>
         </div>
 
         <motion.button

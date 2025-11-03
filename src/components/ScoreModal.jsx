@@ -110,8 +110,8 @@ export default function ScoreModal({
             </div>
           </motion.div>
 
-          {/* Action button - Show Next Level for perfect score, otherwise Retry */}
-          {score.total === 100 ? (
+          {/* Action button - Show Next Level for 90% or higher, otherwise Retry */}
+          {score.total >= 90 ? (
             <motion.button
               className="btn-next-simple"
               onClick={onNextLevel}
@@ -142,4 +142,3 @@ export default function ScoreModal({
     </AnimatePresence>
   );
 }
-

@@ -49,10 +49,6 @@ function calculateLightnessOrderScore(userOrder, idealOrder) {
   let correctPairs = 0;
   let totalPairs = 0;
   
-  console.log('=== Scoring Debug ===');
-  console.log('User order:', userOrder.map(p => ({ id: p.id, hue: p.hsl.h, lightness: p.hsl.l })));
-  console.log('Ideal order:', idealOrder.map(p => ({ id: p.id, hue: p.hsl.h, lightness: p.hsl.l })));
-  
   // Check all pairs
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
@@ -71,8 +67,6 @@ function calculateLightnessOrderScore(userOrder, idealOrder) {
   }
   
   const score = (correctPairs / totalPairs) * 100;
-  console.log(`Correct pairs: ${correctPairs} / ${totalPairs} = ${score.toFixed(2)}%`);
-  console.log('===================');
   
   return score;
 }
