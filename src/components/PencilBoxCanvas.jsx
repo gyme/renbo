@@ -387,18 +387,42 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
       if (Math.abs(gentleScrollDelta) > 0.1) {
         const container = containerRef.current;
         if (container) {
-          // Force a reflow to ensure accurate scrollHeight on mobile devices
+          // Force a reflow to ensure accurate measurements
           void container.offsetHeight;
           
-          // Get current scroll position and max scrollable distance
+          // Get accurate scroll measurements
           const currentScrollTop = container.scrollTop || 0;
           const scrollHeight = container.scrollHeight;
           const clientHeight = container.clientHeight;
-          const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
           
-          // Calculate new scroll position, clamped to valid range
+          // Calculate the actual scrollable distance
+          // scrollHeight includes all content including padding
+          // clientHeight is the visible viewport
+          let maxScrollTop = scrollHeight - clientHeight;
+          
+          // Ensure maxScrollTop is not negative (in case content fits in viewport)
+          maxScrollTop = Math.max(0, maxScrollTop);
+          
+          // Calculate new scroll position
           let newScrollTop = currentScrollTop + gentleScrollDelta;
-          newScrollTop = Math.max(0, Math.min(maxScrollTop, newScrollTop));
+          
+          // Clamp to valid range - allow scrolling to exactly 0 (top) and maxScrollTop (bottom)
+          // Use Math.round to avoid floating point precision issues
+          newScrollTop = Math.round(newScrollTop);
+          
+          // Ensure we can reach the top (0) and bottom (maxScrollTop)
+          // Always allow scrolling to 0 (top)
+          if (newScrollTop < 0) {
+            newScrollTop = 0;
+          }
+          // Only clamp to maxScrollTop if there's actually scrollable content
+          else if (maxScrollTop > 0 && newScrollTop > maxScrollTop) {
+            newScrollTop = maxScrollTop;
+          }
+          // If content fits in viewport, don't scroll
+          else if (maxScrollTop <= 0) {
+            newScrollTop = 0;
+          }
           
           // Scroll the container immediately
           container.scrollTop = newScrollTop;
@@ -692,10 +716,30 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     ctx.scale(dpr, dpr);
   }, [dimensions]);
 
-  // Store container reference for scrolling
+  // Store container reference for scrolling and ensure scroll boundaries are correct
   useEffect(() => {
     dragStateRef.current.containerRef = containerRef.current;
-  }, []);
+    
+    // Ensure container can scroll to top and bottom when dimensions change
+    const container = containerRef.current;
+    if (container) {
+      // Small delay to ensure layout is complete
+      const timeoutId = setTimeout(() => {
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+        const maxScroll = scrollHeight - clientHeight;
+        
+        // If we're scrolled beyond bounds, fix it
+        if (container.scrollTop < 0) {
+          container.scrollTop = 0;
+        } else if (maxScroll > 0 && container.scrollTop > maxScroll) {
+          container.scrollTop = maxScroll;
+        }
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [dimensions]);
 
   // Set up non-passive touch event listeners to avoid preventDefault errors
   useEffect(() => {

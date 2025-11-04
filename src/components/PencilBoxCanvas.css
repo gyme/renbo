@@ -32,6 +32,7 @@
   .pencil-box-canvas-container {
     padding: 10px;
     /* Add bottom padding to account for mobile navigation bar (Android) and safe area (iOS) */
+    /* Use padding on the container's bottom but ensure scrolling works correctly */
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px) + 56px);
     /* Fill exactly the remaining viewport space - no more, no less */
     flex: 1;
@@ -50,6 +51,9 @@
     /* Hide scrollbar but keep functionality */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
+    /* Prevent overscroll bounce but allow normal scrolling */
+    overscroll-behavior-y: contain;
+    overscroll-behavior-x: none;
   }
   
   .pencil-box-canvas-container::-webkit-scrollbar {
