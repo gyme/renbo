@@ -387,13 +387,20 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
       if (Math.abs(gentleScrollDelta) > 0.1) {
         const container = containerRef.current;
         if (container) {
-          // Get current scroll position of the container
+          // Force a reflow to ensure accurate scrollHeight on mobile devices
+          void container.offsetHeight;
+          
+          // Get current scroll position and max scrollable distance
           const currentScrollTop = container.scrollTop || 0;
+          const scrollHeight = container.scrollHeight;
+          const clientHeight = container.clientHeight;
+          const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
           
-          // Calculate new scroll position
-          const newScrollTop = Math.max(0, currentScrollTop + gentleScrollDelta);
+          // Calculate new scroll position, clamped to valid range
+          let newScrollTop = currentScrollTop + gentleScrollDelta;
+          newScrollTop = Math.max(0, Math.min(maxScrollTop, newScrollTop));
           
-          // Scroll the container
+          // Scroll the container immediately
           container.scrollTop = newScrollTop;
         }
       }

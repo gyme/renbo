@@ -120,6 +120,14 @@
   text-transform: capitalize;
 }
 
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
 /* Retry button */
 .btn-retry-simple {
   width: 100%;

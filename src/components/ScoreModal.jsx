@@ -110,32 +110,37 @@ export default function ScoreModal({
             </div>
           </motion.div>
 
-          {/* Action button - Show Next Level for 90% or higher, otherwise Retry */}
-          {score.total >= 90 ? (
-            <motion.button
-              className="btn-next-simple"
-              onClick={onNextLevel}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              ✨ Next Level →
-            </motion.button>
-          ) : (
-            <motion.button
-              className="btn-retry-simple"
-              onClick={onRetry}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              🔄 Retry Level
-            </motion.button>
-          )}
+          {/* Action buttons */}
+          <motion.div
+            className="action-buttons"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+          >
+            {/* Show Next Level button for 90% or higher */}
+            {score.total >= 90 && (
+              <motion.button
+                className="btn-next-simple"
+                onClick={onNextLevel}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                ✨ Next Level →
+              </motion.button>
+            )}
+            
+            {/* Show Retry button for scores below 90%, or also for 90-99% to allow retrying for higher points */}
+            {(score.total < 90 || (score.total >= 90 && score.total < 100)) && (
+              <motion.button
+                className="btn-retry-simple"
+                onClick={onRetry}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                🔄 Retry Level
+              </motion.button>
+            )}
+          </motion.div>
         </motion.div>
       </div>
       )}
