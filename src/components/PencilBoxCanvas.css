@@ -31,6 +31,8 @@
 @media (max-width: 768px) {
   .pencil-box-canvas-container {
     padding: 10px;
+    /* Add bottom padding to account for mobile navigation bar (Android) and safe area (iOS) */
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px) + 56px);
     /* Fill exactly the remaining viewport space - no more, no less */
     flex: 1;
     display: flex;
@@ -61,6 +63,8 @@
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
+    /* Add bottom margin to ensure last pencil is visible above navigation bar */
+    margin-bottom: 20px;
     /* Height is set by JavaScript based on pencil count - don't constrain it */
   }
 }

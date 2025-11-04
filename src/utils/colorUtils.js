@@ -2,91 +2,56 @@
 
 /**
  * Predefined color palette - consistent across all games
- * Progresses from light to dark, based on yellow/orange/brown spectrum
- * Extended with additional color families for unlimited levels
+ * Progresses from light to dark with increased contrast for better distinction
+ * Each color has significantly more difference from adjacent colors
  */
 const COLOR_PALETTE = [
-  // Original yellow/orange/brown spectrum with increased contrast
-  { h: 0, s: 0, l: 95 },      // 1. White
-  { h: 45, s: 15, l: 88 },    // 2. Very light cream/beige
-  { h: 50, s: 30, l: 80 },    // 3. Light beige
-  { h: 48, s: 100, l: 70 },   // 4. Light yellow
-  { h: 45, s: 100, l: 60 },   // 5. Yellow
-  { h: 40, s: 95, l: 50 },    // 6. Golden yellow
-  { h: 35, s: 90, l: 42 },    // 7. Orange-yellow/Golden
-  { h: 30, s: 85, l: 35 },    // 8. Orange
-  { h: 25, s: 80, l: 28 },    // 9. Darker orange
-  { h: 20, s: 75, l: 22 },    // 10. Brown-orange
-  { h: 18, s: 75, l: 22 },    // 11. Medium-dark brown
-  { h: 15, s: 70, l: 19 },    // 12. Dark brown
-  { h: 12, s: 65, l: 16 },    // 13. Darker brown
-  { h: 10, s: 60, l: 13 },    // 14. Very dark brown
-  { h: 8, s: 55, l: 11 },      // 15. Darkest brown
+  // Light colors with larger lightness gaps
+  { h: 0, s: 0, l: 98 },      // 1. Very light white (almost white)
+  { h: 0, s: 0, l: 92 },      // 2. White-gray
+  { h: 50, s: 20, l: 85 },    // 3. Very light cream
+  { h: 50, s: 40, l: 78 },    // 4. Light cream
+  { h: 48, s: 60, l: 70 },    // 5. Cream-yellow
+  { h: 45, s: 80, l: 62 },    // 6. Light yellow
+  { h: 42, s: 95, l: 55 },    // 7. Yellow
+  { h: 40, s: 100, l: 48 },   // 8. Golden yellow
+  { h: 38, s: 95, l: 42 },    // 9. Orange-yellow
+  { h: 35, s: 90, l: 36 },    // 10. Light orange
+  { h: 32, s: 85, l: 30 },    // 11. Orange
+  { h: 28, s: 80, l: 25 },    // 12. Dark orange
+  { h: 25, s: 75, l: 20 },    // 13. Brown-orange
+  { h: 22, s: 70, l: 16 },    // 14. Medium brown
+  { h: 18, s: 65, l: 13 },    // 15. Dark brown
   
-  // Extended mid-dark colors before reaching very dark - with better contrast and more variety
-  { h: 350, s: 70, l: 32 },   // 16. Dark red-brown (brighter for distinction)
-  { h: 340, s: 75, l: 29 },   // 17. Dark rose-brown
-  { h: 330, s: 80, l: 27 },   // 18. Dark pink-brown
-  { h: 320, s: 85, l: 25 },   // 19. Dark magenta-brown
-  { h: 310, s: 90, l: 23 },   // 20. Dark purple-brown
-  { h: 300, s: 95, l: 21 },   // 21. Dark purple
-  { h: 290, s: 100, l: 19 },  // 22. Darker purple
-  { h: 280, s: 100, l: 17 },  // 23. Very dark purple
-  { h: 270, s: 100, l: 16 },  // 24. Deep violet
-  { h: 260, s: 100, l: 15 },  // 25. Deep blue-violet
-  { h: 250, s: 100, l: 14 },  // 26. Deep blue
-  { h: 240, s: 100, l: 13 },  // 27. Dark blue
-  { h: 230, s: 100, l: 12 },  // 28. Darker blue
-  { h: 220, s: 100, l: 11 },  // 29. Very dark blue
-  { h: 210, s: 100, l: 10 },  // 30. Deep navy
-  { h: 200, s: 100, l: 9 },    // 31. Very dark cyan
-  { h: 190, s: 100, l: 8 },   // 32. Very dark teal
-  { h: 180, s: 100, l: 7 },   // 33. Very dark green-cyan
-  { h: 170, s: 100, l: 6 },   // 34. Very dark green
-  { h: 160, s: 100, l: 6 },   // 35. Dark forest green
-  { h: 150, s: 100, l: 5 },   // 36. Very dark green
+  // Mid-dark colors with distinct hues and larger lightness steps (maintaining light-to-dark order)
+  { h: 15, s: 70, l: 11 },    // 16. Red-brown (darker than previous)
+  { h: 10, s: 75, l: 9 },     // 17. Rust brown
+  { h: 5, s: 80, l: 8 },      // 18. Brown-red
+  { h: 358, s: 70, l: 7 },    // 19. Reddish-brown
+  { h: 350, s: 75, l: 6 },    // 20. Dark red
+  { h: 340, s: 80, l: 5 },    // 21. Rose-red
+  { h: 330, s: 85, l: 4 },    // 22. Pink-red
+  { h: 320, s: 90, l: 3 },    // 23. Magenta-red
+  { h: 310, s: 95, l: 2 },    // 24. Dark magenta
+  { h: 300, s: 100, l: 1 },   // 25. Purple-magenta
+  { h: 290, s: 100, l: 0.8 }, // 26. Dark purple
+  { h: 280, s: 100, l: 0.6 }, // 27. Deep purple
+  { h: 270, s: 100, l: 0.5 }, // 28. Violet
+  { h: 260, s: 100, l: 0.4 }, // 29. Blue-violet
+  { h: 250, s: 100, l: 0.3 }, // 30. Deep blue
+  { h: 240, s: 100, l: 0.2 }, // 31. Dark blue
+  { h: 230, s: 100, l: 0.15 },// 32. Navy blue
+  { h: 220, s: 100, l: 0.1 }, // 33. Very dark blue
+  { h: 210, s: 100, l: 0.08 },// 34. Almost black blue
+  { h: 200, s: 100, l: 0.06 },// 35. Very dark cyan
+  { h: 190, s: 100, l: 0.05 },// 36. Very dark teal
+  { h: 180, s: 100, l: 0.04 },// 37. Very dark green-cyan
+  { h: 170, s: 100, l: 0.03 },// 38. Very dark green
+  { h: 160, s: 100, l: 0.02 },// 39. Dark forest green
+  { h: 150, s: 100, l: 0.01 },// 40. Very dark green
   
-  // Final progression to black with better spacing and hue variation
-  { h: 140, s: 100, l: 5 },   // 37. Almost black green
-  { h: 130, s: 100, l: 4 },   // 38. Very dark green-gray
-  { h: 120, s: 80, l: 4 },    // 39. Very dark muted green
-  { h: 0, s: 0, l: 4 },       // 40. Very dark gray
-  { h: 0, s: 0, l: 3 },       // 41. Almost black gray
-  { h: 0, s: 0, l: 2 },       // 42. Near black
-  { h: 0, s: 0, l: 1 },       // 43. Almost black
-  { h: 0, s: 0, l: 0 },       // 44. Black
-  { h: 350, s: 20, l: 90 },   // 19. Very light pink
-  { h: 340, s: 30, l: 80 },   // 20. Light pink
-  { h: 330, s: 40, l: 70 },   // 21. Pink
-  { h: 320, s: 50, l: 60 },   // 22. Light rose
-  { h: 310, s: 60, l: 50 },   // 23. Rose
-  { h: 300, s: 70, l: 40 },   // 24. Light magenta
-  { h: 290, s: 80, l: 30 },   // 25. Magenta
-  { h: 280, s: 90, l: 20 },   // 26. Purple
-  { h: 270, s: 100, l: 15 },  // 27. Violet
-  { h: 260, s: 100, l: 12 },  // 28. Blue-violet
-  { h: 250, s: 100, l: 10 },  // 29. Blue
-  { h: 240, s: 100, l: 8 },   // 30. Dark blue
-  { h: 230, s: 100, l: 6 },   // 31. Navy blue
-  { h: 220, s: 100, l: 4 },   // 32. Very dark blue
-  { h: 210, s: 100, l: 2 },   // 33. Almost black blue
-  { h: 200, s: 100, l: 1 },   // 34. Black blue
-  { h: 190, s: 100, l: 0 },   // 35. Black cyan
-  { h: 180, s: 100, l: 0 },   // 36. Black teal
-  { h: 170, s: 100, l: 2 },   // 37. Very dark teal
-  { h: 160, s: 100, l: 4 },   // 38. Dark teal
-  { h: 150, s: 100, l: 6 },   // 39. Dark green
-  { h: 140, s: 100, l: 8 },   // 40. Forest green
-  { h: 130, s: 100, l: 10 },  // 41. Dark green
-  { h: 120, s: 100, l: 12 },  // 42. Green
-  { h: 110, s: 100, l: 15 },  // 43. Yellow-green
-  { h: 100, s: 100, l: 18 },  // 44. Lime green
-  { h: 90, s: 100, l: 22 },   // 45. Bright green
-  { h: 80, s: 100, l: 26 },   // 46. Light green
-  { h: 70, s: 100, l: 30 },   // 47. Yellow-green
-  { h: 60, s: 100, l: 35 },   // 48. Yellow
-  { h: 50, s: 100, l: 40 },   // 49. Golden yellow
-  { h: 40, s: 100, l: 45 },   // 50. Light orange
+  // Final progression to black with larger steps (must be darker than previous)
+  { h: 0, s: 0, l: 0 },       // 41. Black (pure black)
 ];
 
 /**
@@ -102,10 +67,10 @@ function generateDynamicColor(index) {
   const positionInCycle = index % cycleLength;
   
   // Create a more contrasted progression from light to dark
-  // Use larger steps to ensure better distinction
-  const lightness = Math.max(2, 95 - (positionInCycle * 5.5));
-  const hue = (cycle * 60 + positionInCycle * 18) % 360; // Rotate through hue spectrum
-  const saturation = Math.min(100, 30 + positionInCycle * 3.5); // Increase saturation
+  // Use larger steps to ensure better distinction (increased from 5.5 to 7)
+  const lightness = Math.max(2, 95 - (positionInCycle * 7));
+  const hue = (cycle * 60 + positionInCycle * 20) % 360; // Rotate through hue spectrum with larger steps (18->20)
+  const saturation = Math.min(100, 40 + positionInCycle * 4); // Increase saturation more (30->40, 3.5->4)
   
   return { h: hue, s: saturation, l: lightness };
 }

@@ -661,8 +661,9 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         // This ensures pencils are never compressed, container will scroll
         const totalPencilHeight = pencils.length * PENCIL_HEIGHT;
         const totalSpacing = Math.max(0, (pencils.length - 1) * PENCIL_SPACING);
-        const padding = 40; // Top and bottom padding
-        const height = Math.max(200, totalPencilHeight + totalSpacing + padding);
+        const padding = 40; // Top padding
+        const bottomPadding = 80; // Extra bottom padding to account for mobile navigation bar
+        const height = Math.max(200, totalPencilHeight + totalSpacing + padding + bottomPadding);
         
         setDimensions({ width, height });
       }
