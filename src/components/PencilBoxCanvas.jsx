@@ -5,6 +5,8 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 400, height: 600 });
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
   const dragStateRef = useRef({
     isDragging: false,
     draggedIndex: -1,
@@ -29,7 +31,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
   const calculatePositions = useCallback(() => {
     const containerWidth = dimensions.width;
     const startX = (containerWidth - PENCIL_WIDTH) / 2;
-    const startY = 20; // Start closer to top
+    const startY = 20; // Top padding for buffer
 
     return pencils.map((_, index) => ({
       x: startX,
@@ -378,40 +380,44 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     if (isTouch && state.lastScrollY !== 0) {
       const scrollDelta = clientY - state.lastScrollY;
       
-      // Make scrolling gentler by reducing sensitivity (multiply by 0.5)
-      const gentleScrollDelta = scrollDelta * 0.5;
-      
-      // Scroll in the same direction as drag movement
-      // Positive scrollDelta (dragging down) → scroll container down
-      // Negative scrollDelta (dragging up) → scroll container up
-      if (Math.abs(gentleScrollDelta) > 0.1) {
-        const container = containerRef.current;
-        if (container) {
-          // Force a reflow to ensure accurate measurements
-          void container.offsetHeight;
-          
-          // Get accurate scroll measurements
-          const currentScrollTop = container.scrollTop || 0;
-          const scrollHeight = container.scrollHeight;
-          const clientHeight = container.clientHeight;
-          
-          // Calculate the actual scrollable distance
-          // scrollHeight includes all content including padding
-          // clientHeight is the visible viewport
-          let maxScrollTop = scrollHeight - clientHeight;
-          
-          // Ensure maxScrollTop is not negative (in case content fits in viewport)
-          maxScrollTop = Math.max(0, maxScrollTop);
-          
+      const container = containerRef.current;
+      if (container) {
+        // Force a reflow to ensure accurate measurements
+        void container.offsetHeight;
+        
+        // Get accurate scroll measurements
+        const currentScrollTop = container.scrollTop || 0;
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+        
+        // Calculate the actual scrollable distance
+        let maxScrollTop = scrollHeight - clientHeight;
+        maxScrollTop = Math.max(0, maxScrollTop);
+        
+        // Make scrolling gentler by reducing sensitivity (multiply by 0.5)
+        let gentleScrollDelta = scrollDelta * 0.5;
+        
+        // If scrolling up (negative delta), be more aggressive when far from top
+        // This ensures we can reach the top even when starting from the bottom
+        if (gentleScrollDelta < 0 && currentScrollTop > 50) {
+          // Increase scroll speed when far from top to make it easier to reach
+          gentleScrollDelta = scrollDelta * 0.7;
+        }
+        
+        // If scrolling up and we're close to the top, allow reaching exactly 0
+        if (gentleScrollDelta < 0 && currentScrollTop <= 50) {
+          // When close to top, ensure we can reach 0
+          gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
+        }
+        
+        // Scroll in the same direction as drag movement
+        // Positive scrollDelta (dragging down) → scroll container down
+        // Negative scrollDelta (dragging up) → scroll container up
+        if (Math.abs(gentleScrollDelta) > 0.1) {
           // Calculate new scroll position
           let newScrollTop = currentScrollTop + gentleScrollDelta;
           
           // Clamp to valid range - allow scrolling to exactly 0 (top) and maxScrollTop (bottom)
-          // Use Math.round to avoid floating point precision issues
-          newScrollTop = Math.round(newScrollTop);
-          
-          // Ensure we can reach the top (0) and bottom (maxScrollTop)
-          // Always allow scrolling to 0 (top)
           if (newScrollTop < 0) {
             newScrollTop = 0;
           }
@@ -424,8 +430,30 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
             newScrollTop = 0;
           }
           
+          // Use Math.round to avoid floating point precision issues, but only after clamping
+          newScrollTop = Math.round(newScrollTop);
+          
+          // Ensure we can still reach exactly 0 after rounding
+          if (newScrollTop < 0) {
+            newScrollTop = 0;
+          }
+          
+          // If we're very close to top (within 2px) and scrolling up, force to exactly 0
+          if (newScrollTop > 0 && newScrollTop <= 2 && gentleScrollDelta < 0) {
+            newScrollTop = 0;
+          }
+          
           // Scroll the container immediately
           container.scrollTop = newScrollTop;
+          
+          // Force scroll to 0 if we're at the very top (handles any browser rounding issues)
+          // Use requestAnimationFrame to ensure this happens after the browser processes the scroll
+          requestAnimationFrame(() => {
+            if (container.scrollTop > 0 && newScrollTop === 0) {
+              container.scrollTop = 0;
+            }
+            checkScrollState();
+          });
         }
       }
       
@@ -685,9 +713,9 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         // This ensures pencils are never compressed, container will scroll
         const totalPencilHeight = pencils.length * PENCIL_HEIGHT;
         const totalSpacing = Math.max(0, (pencils.length - 1) * PENCIL_SPACING);
-        const padding = 40; // Top padding
-        const bottomPadding = 80; // Extra bottom padding to account for mobile navigation bar
-        const height = Math.max(200, totalPencilHeight + totalSpacing + padding + bottomPadding);
+        const topPadding = 40; // Top padding for buffer (prevents cropping at top)
+        const bottomPadding = 30; // Bottom padding for buffer and mobile navigation bar
+        const height = Math.max(200, totalPencilHeight + totalSpacing + topPadding + bottomPadding);
         
         setDimensions({ width, height });
       }
@@ -716,6 +744,24 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     ctx.scale(dpr, dpr);
   }, [dimensions]);
 
+  // Check scroll state and update scroll buttons visibility
+  const checkScrollState = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const scrollTop = container.scrollTop || 0;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+    const maxScroll = Math.max(0, scrollHeight - clientHeight);
+    
+    // Use a threshold to avoid showing buttons when at the edges
+    // Show up button only if we can actually scroll up meaningfully
+    // Use a smaller threshold (5px) to ensure button disappears when truly at top
+    setCanScrollUp(scrollTop > 5);
+    // Show down button only if we can actually scroll down meaningfully
+    setCanScrollDown(maxScroll > 0 && scrollTop < maxScroll - 5);
+  }, []);
+
   // Store container reference for scrolling and ensure scroll boundaries are correct
   useEffect(() => {
     dragStateRef.current.containerRef = containerRef.current;
@@ -735,11 +781,67 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         } else if (maxScroll > 0 && container.scrollTop > maxScroll) {
           container.scrollTop = maxScroll;
         }
+        
+        // Check scroll state for buttons
+        checkScrollState();
       }, 100);
       
-      return () => clearTimeout(timeoutId);
+      // Listen for scroll events to update button visibility
+      const handleScroll = () => {
+        checkScrollState();
+      };
+      
+      // Use passive listener for better performance
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      
+      // Also check on resize
+      const handleResize = () => {
+        setTimeout(() => {
+          checkScrollState();
+        }, 50);
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        container.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleResize);
+      };
     }
-  }, [dimensions]);
+  }, [dimensions, checkScrollState]);
+
+  // Scroll handlers
+  const handleScrollUp = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const scrollAmount = container.clientHeight * 0.8; // Scroll 80% of viewport
+    const newScrollTop = Math.max(0, container.scrollTop - scrollAmount);
+    container.scrollTo({ top: newScrollTop, behavior: 'smooth' });
+    
+    // Update scroll state after scrolling
+    setTimeout(() => {
+      checkScrollState();
+    }, 100);
+  }, [checkScrollState]);
+
+  const handleScrollDown = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+    const maxScroll = Math.max(0, scrollHeight - clientHeight);
+    const scrollAmount = container.clientHeight * 0.8; // Scroll 80% of viewport
+    const newScrollTop = Math.min(maxScroll, container.scrollTop + scrollAmount);
+    container.scrollTo({ top: newScrollTop, behavior: 'smooth' });
+    
+    // Update scroll state after scrolling
+    setTimeout(() => {
+      checkScrollState();
+    }, 100);
+  }, [checkScrollState]);
 
   // Set up non-passive touch event listeners to avoid preventDefault errors
   useEffect(() => {
@@ -788,19 +890,41 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
   }, [handlePointerDown, handlePointerMove, handlePointerUp]);
 
   return (
-    <div 
-      ref={containerRef}
-      className="pencil-box-canvas-container"
-    >
-      <canvas
-        ref={canvasRef}
-        className="pencil-canvas"
-        onMouseDown={handlePointerDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handlePointerUp}
-        onMouseLeave={handlePointerUp}
-        style={{ touchAction: 'pan-y' }}
-      />
+    <div className="pencil-box-canvas-wrapper">
+      <div 
+        ref={containerRef}
+        className="pencil-box-canvas-container"
+      >
+        <canvas
+          ref={canvasRef}
+          className="pencil-canvas"
+          onMouseDown={handlePointerDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handlePointerUp}
+          onMouseLeave={handlePointerUp}
+          style={{ touchAction: 'pan-y' }}
+        />
+      </div>
+      
+      {/* Scroll buttons - outside scrolling container */}
+      {canScrollUp && (
+        <button
+          className="scroll-button scroll-button-up"
+          onClick={handleScrollUp}
+          aria-label="Scroll up"
+        >
+          ↑
+        </button>
+      )}
+      {canScrollDown && (
+        <button
+          className="scroll-button scroll-button-down"
+          onClick={handleScrollDown}
+          aria-label="Scroll down"
+        >
+          ↓
+        </button>
+      )}
     </div>
   );
 }

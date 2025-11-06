@@ -23,35 +23,57 @@ const COLOR_PALETTE = [
   { h: 22, s: 70, l: 16 },    // 14. Medium brown
   { h: 18, s: 65, l: 13 },    // 15. Dark brown
   
-  // Mid-dark colors with distinct hues and larger lightness steps (maintaining light-to-dark order)
-  { h: 15, s: 70, l: 11 },    // 16. Red-brown (darker than previous)
-  { h: 10, s: 75, l: 9 },     // 17. Rust brown
-  { h: 5, s: 80, l: 8 },      // 18. Brown-red
-  { h: 358, s: 70, l: 7 },    // 19. Reddish-brown
-  { h: 350, s: 75, l: 6 },    // 20. Dark red
-  { h: 340, s: 80, l: 5 },    // 21. Rose-red
-  { h: 330, s: 85, l: 4 },    // 22. Pink-red
-  { h: 320, s: 90, l: 3 },    // 23. Magenta-red
-  { h: 310, s: 95, l: 2 },    // 24. Dark magenta
-  { h: 300, s: 100, l: 1 },   // 25. Purple-magenta
-  { h: 290, s: 100, l: 0.8 }, // 26. Dark purple
-  { h: 280, s: 100, l: 0.6 }, // 27. Deep purple
-  { h: 270, s: 100, l: 0.5 }, // 28. Violet
-  { h: 260, s: 100, l: 0.4 }, // 29. Blue-violet
-  { h: 250, s: 100, l: 0.3 }, // 30. Deep blue
-  { h: 240, s: 100, l: 0.2 }, // 31. Dark blue
-  { h: 230, s: 100, l: 0.15 },// 32. Navy blue
-  { h: 220, s: 100, l: 0.1 }, // 33. Very dark blue
-  { h: 210, s: 100, l: 0.08 },// 34. Almost black blue
-  { h: 200, s: 100, l: 0.06 },// 35. Very dark cyan
-  { h: 190, s: 100, l: 0.05 },// 36. Very dark teal
-  { h: 180, s: 100, l: 0.04 },// 37. Very dark green-cyan
-  { h: 170, s: 100, l: 0.03 },// 38. Very dark green
-  { h: 160, s: 100, l: 0.02 },// 39. Dark forest green
-  { h: 150, s: 100, l: 0.01 },// 40. Very dark green
+  // Mid-range colors with more variety and better distinction
+  { h: 20, s: 60, l: 11 },    // 16. Medium-dark brown
+  { h: 15, s: 65, l: 10 },    // 17. Red-brown
+  { h: 10, s: 70, l: 9 },     // 18. Rust brown
+  { h: 5, s: 75, l: 8 },      // 19. Brown-red
+  { h: 0, s: 70, l: 7 },      // 20. Reddish-brown
+  { h: 355, s: 75, l: 6.5 },  // 21. Dark red-orange
+  { h: 350, s: 80, l: 6 },    // 22. Dark red
+  { h: 345, s: 75, l: 5.5 },  // 23. Deep red
+  { h: 340, s: 80, l: 5 },    // 24. Rose-red
+  { h: 335, s: 75, l: 4.5 },  // 25. Dark rose
+  { h: 330, s: 85, l: 4 },    // 26. Pink-red
+  { h: 325, s: 80, l: 3.5 },  // 27. Deep pink
+  { h: 320, s: 90, l: 3 },    // 28. Magenta-red
+  { h: 315, s: 85, l: 2.5 },  // 29. Dark magenta-pink
+  { h: 310, s: 95, l: 2 },    // 30. Dark magenta
+  { h: 305, s: 90, l: 1.8 },  // 31. Deep magenta
+  { h: 300, s: 100, l: 1.5 }, // 32. Purple-magenta
+  { h: 295, s: 95, l: 1.3 },  // 33. Dark purple-magenta
+  { h: 290, s: 100, l: 1.1 }, // 34. Dark purple
+  { h: 285, s: 95, l: 0.9 },  // 35. Deep purple
+  { h: 280, s: 100, l: 0.7 }, // 36. Deep purple
+  { h: 275, s: 95, l: 0.6 },  // 37. Violet-purple
+  { h: 270, s: 100, l: 0.5 }, // 38. Violet
+  { h: 265, s: 95, l: 0.45 }, // 39. Blue-violet
+  { h: 260, s: 100, l: 0.4 }, // 40. Blue-violet
+  { h: 255, s: 95, l: 0.35 }, // 41. Deep blue-violet
+  { h: 250, s: 100, l: 0.3 }, // 42. Deep blue
+  { h: 245, s: 95, l: 0.25 }, // 43. Dark blue
+  { h: 240, s: 100, l: 0.2 }, // 44. Dark blue
+  { h: 235, s: 95, l: 0.18 }, // 45. Navy blue
+  { h: 230, s: 100, l: 0.15 },// 46. Navy blue
+  { h: 225, s: 95, l: 0.12 }, // 47. Very dark blue
+  { h: 220, s: 100, l: 0.1 }, // 48. Very dark blue
+  { h: 215, s: 95, l: 0.09 }, // 49. Almost black blue
+  { h: 210, s: 100, l: 0.08 },// 50. Almost black blue
+  { h: 205, s: 95, l: 0.07 }, // 51. Very dark cyan-blue
+  { h: 200, s: 100, l: 0.06 },// 52. Very dark cyan
+  { h: 195, s: 95, l: 0.055 },// 53. Very dark teal-cyan
+  { h: 190, s: 100, l: 0.05 },// 54. Very dark teal
+  { h: 185, s: 95, l: 0.045 },// 55. Very dark green-teal
+  { h: 180, s: 100, l: 0.04 },// 56. Very dark green-cyan
+  { h: 175, s: 95, l: 0.035 },// 57. Very dark green
+  { h: 170, s: 100, l: 0.03 },// 58. Very dark green
+  { h: 165, s: 95, l: 0.025 },// 59. Dark forest green
+  { h: 160, s: 100, l: 0.02 },// 60. Dark forest green
+  { h: 155, s: 95, l: 0.015 },// 61. Very dark green
+  { h: 150, s: 100, l: 0.01 },// 62. Very dark green
   
   // Final progression to black with larger steps (must be darker than previous)
-  { h: 0, s: 0, l: 0 },       // 41. Black (pure black)
+  { h: 0, s: 0, l: 0 },       // 63. Black (pure black)
 ];
 
 /**
