@@ -410,6 +410,20 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
           gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
         }
         
+        // If scrolling down (positive delta), be more aggressive when far from bottom
+        // This ensures we can reach the bottom even when starting from the top
+        if (gentleScrollDelta > 0 && maxScrollTop > 0 && (maxScrollTop - currentScrollTop) > 50) {
+          // Increase scroll speed when far from bottom to make it easier to reach
+          gentleScrollDelta = scrollDelta * 0.7;
+        }
+        
+        // If scrolling down and we're close to the bottom, allow reaching exactly maxScrollTop
+        if (gentleScrollDelta > 0 && maxScrollTop > 0 && (maxScrollTop - currentScrollTop) <= 50) {
+          // When close to bottom, ensure we can reach maxScrollTop
+          const remainingScroll = maxScrollTop - currentScrollTop;
+          gentleScrollDelta = Math.min(gentleScrollDelta, remainingScroll);
+        }
+        
         // Scroll in the same direction as drag movement
         // Positive scrollDelta (dragging down) → scroll container down
         // Negative scrollDelta (dragging up) → scroll container up
@@ -443,14 +457,21 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
             newScrollTop = 0;
           }
           
+          // If we're very close to bottom (within 2px) and scrolling down, force to exactly maxScrollTop
+          if (maxScrollTop > 0 && newScrollTop < maxScrollTop && newScrollTop >= (maxScrollTop - 2) && gentleScrollDelta > 0) {
+            newScrollTop = maxScrollTop;
+          }
+          
           // Scroll the container immediately
           container.scrollTop = newScrollTop;
           
-          // Force scroll to 0 if we're at the very top (handles any browser rounding issues)
+          // Force scroll to correct position if we're at the edges (handles any browser rounding issues)
           // Use requestAnimationFrame to ensure this happens after the browser processes the scroll
           requestAnimationFrame(() => {
-            if (container.scrollTop > 0 && newScrollTop === 0) {
+            if (newScrollTop === 0 && container.scrollTop > 0) {
               container.scrollTop = 0;
+            } else if (maxScrollTop > 0 && newScrollTop === maxScrollTop && container.scrollTop < maxScrollTop) {
+              container.scrollTop = maxScrollTop;
             }
             checkScrollState();
           });
