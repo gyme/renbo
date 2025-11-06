@@ -415,40 +415,59 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         
         // If scrolling up (negative delta), be more aggressive when far from top
         // This ensures we can reach the top even when starting from the bottom
-        if (gentleScrollDelta < 0 && currentScrollTop > 50) {
-          // Increase scroll speed when far from top to make it easier to reach
-          gentleScrollDelta = scrollDelta * 0.85; // More aggressive
-        }
-        
-        // If scrolling up and we're close to the top, be very aggressive to reach exactly 0
-        if (gentleScrollDelta < 0 && currentScrollTop <= 50) {
-          // When close to top, be more aggressive and ensure we can reach 0
-          if (currentScrollTop <= 20) {
+        if (gentleScrollDelta < 0) {
+          if (currentScrollTop > 100) {
+            // Very far from top - use very aggressive scroll
+            gentleScrollDelta = scrollDelta * 0.9;
+          } else if (currentScrollTop > 50) {
+            // Far from top - increase scroll speed
+            gentleScrollDelta = scrollDelta * 0.85;
+          } else if (currentScrollTop <= 20) {
             // Very close to top - use almost full scroll delta
             gentleScrollDelta = scrollDelta * 0.95;
+            // Ensure we don't overshoot
+            gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
           } else {
             // Moderately close - still aggressive
             gentleScrollDelta = scrollDelta * 0.9;
+            // Ensure we don't overshoot
+            gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
           }
-          // Ensure we don't overshoot
-          gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
         }
         
         // Proactive scrolling: if pencil is near top edge and moving up, scroll more aggressively
         if (nearTopEdge && gentleScrollDelta < 0) {
           gentleScrollDelta = scrollDelta * 0.95; // Very responsive when near top edge
+          // Ensure we don't overshoot
+          gentleScrollDelta = Math.min(gentleScrollDelta, -currentScrollTop);
         }
         
         // If scrolling down (positive delta), be more aggressive when far from bottom
         // This ensures we can reach the bottom even when starting from the top
-        if (gentleScrollDelta > 0 && maxScrollTop > 0 && (maxScrollTop - currentScrollTop) > 50) {
-          // Increase scroll speed when far from bottom to make it easier to reach
-          gentleScrollDelta = scrollDelta * 0.7;
+        if (gentleScrollDelta > 0 && maxScrollTop > 0) {
+          const distanceFromBottom = maxScrollTop - currentScrollTop;
+          if (distanceFromBottom > 100) {
+            // Very far from bottom - use very aggressive scroll
+            gentleScrollDelta = scrollDelta * 0.9;
+          } else if (distanceFromBottom > 50) {
+            // Far from bottom - increase scroll speed
+            gentleScrollDelta = scrollDelta * 0.85;
+          } else if (distanceFromBottom <= 20) {
+            // Very close to bottom - use almost full scroll delta
+            gentleScrollDelta = scrollDelta * 0.95;
+            // Ensure we don't overshoot
+            gentleScrollDelta = Math.min(gentleScrollDelta, distanceFromBottom);
+          } else {
+            // Moderately close - still aggressive
+            gentleScrollDelta = scrollDelta * 0.9;
+            // Ensure we don't overshoot
+            gentleScrollDelta = Math.min(gentleScrollDelta, distanceFromBottom);
+          }
         }
         
-        // If scrolling down and we're close to the bottom, allow reaching exactly maxScrollTop
-        if (gentleScrollDelta > 0 && maxScrollTop > 0 && (maxScrollTop - currentScrollTop) <= 50) {
-          // When close to bottom, ensure we can reach maxScrollTop
+        // Proactive scrolling: if pencil is near bottom edge and moving down, scroll more aggressively
+        if (nearBottomEdge && gentleScrollDelta > 0 && maxScrollTop > 0) {
+          gentleScrollDelta = scrollDelta * 0.95; // Very responsive when near bottom edge
           const remainingScroll = maxScrollTop - currentScrollTop;
           gentleScrollDelta = Math.min(gentleScrollDelta, remainingScroll);
         }
@@ -491,8 +510,13 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
             newScrollTop = 0;
           }
           
-          // If we're very close to bottom (within 2px) and scrolling down, force to exactly maxScrollTop
-          if (maxScrollTop > 0 && newScrollTop < maxScrollTop && newScrollTop >= (maxScrollTop - 2) && gentleScrollDelta > 0) {
+          // If we're very close to bottom (within 5px) and scrolling down, force to exactly maxScrollTop
+          if (maxScrollTop > 0 && newScrollTop < maxScrollTop && newScrollTop >= (maxScrollTop - 5) && gentleScrollDelta > 0) {
+            newScrollTop = maxScrollTop;
+          }
+          
+          // If we're scrolling down and current scroll is very close to bottom, force to maxScrollTop
+          if (gentleScrollDelta > 0 && maxScrollTop > 0 && (maxScrollTop - currentScrollTop) <= 5) {
             newScrollTop = maxScrollTop;
           }
           
@@ -505,14 +529,23 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
             // Force to 0 if we're at the top (with a small tolerance)
             if (newScrollTop === 0 || container.scrollTop <= 5) {
               container.scrollTop = 0;
-            } else if (maxScrollTop > 0 && newScrollTop === maxScrollTop && container.scrollTop < maxScrollTop) {
+            } 
+            // Force to maxScrollTop if we're at the bottom (with a small tolerance)
+            else if (maxScrollTop > 0 && (newScrollTop === maxScrollTop || container.scrollTop >= (maxScrollTop - 5))) {
               container.scrollTop = maxScrollTop;
             }
-            // Double-check after a short delay to ensure we reached the top
+            // Double-check after a short delay to ensure we reached the edges
             if (newScrollTop === 0 && container.scrollTop > 0) {
               setTimeout(() => {
                 if (container.scrollTop > 0 && container.scrollTop <= 5) {
                   container.scrollTop = 0;
+                }
+                checkScrollState();
+              }, 50);
+            } else if (maxScrollTop > 0 && newScrollTop === maxScrollTop && container.scrollTop < maxScrollTop) {
+              setTimeout(() => {
+                if (container.scrollTop < maxScrollTop && container.scrollTop >= (maxScrollTop - 5)) {
+                  container.scrollTop = maxScrollTop;
                 }
                 checkScrollState();
               }, 50);
