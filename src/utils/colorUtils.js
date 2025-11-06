@@ -6,71 +6,71 @@
  * Each color has significantly more difference from adjacent colors
  */
 const COLOR_PALETTE = [
-  // Light colors with larger lightness gaps
-  { h: 0, s: 0, l: 98 },      // 1. Very light white (almost white)
-  { h: 0, s: 0, l: 92 },      // 2. White-gray
-  { h: 50, s: 20, l: 85 },    // 3. Very light cream
-  { h: 50, s: 40, l: 78 },    // 4. Light cream
-  { h: 48, s: 60, l: 70 },    // 5. Cream-yellow
-  { h: 45, s: 80, l: 62 },    // 6. Light yellow
-  { h: 42, s: 95, l: 55 },    // 7. Yellow
-  { h: 40, s: 100, l: 48 },   // 8. Golden yellow
-  { h: 38, s: 95, l: 42 },    // 9. Orange-yellow
-  { h: 35, s: 90, l: 36 },    // 10. Light orange
-  { h: 32, s: 85, l: 30 },    // 11. Orange
-  { h: 28, s: 80, l: 25 },    // 12. Dark orange
-  { h: 25, s: 75, l: 20 },    // 13. Brown-orange
-  { h: 22, s: 70, l: 16 },    // 14. Medium brown
-  { h: 18, s: 65, l: 13 },    // 15. Dark brown
+  // Light colors with EXTREME gaps and completely different hues for maximum distinction
+  { h: 0, s: 0, l: 100 },     // 1. Pure white
+  { h: 0, s: 0, l: 75 },      // 2. Medium gray (25 point gap - very distinct)
+  { h: 50, s: 60, l: 60 },    // 3. Light cream (15 point gap, yellow hue)
+  { h: 45, s: 100, l: 48 },   // 4. Bright yellow (12 point gap, full saturation)
+  { h: 40, s: 100, l: 38 },   // 5. Golden yellow (10 point gap, full saturation)
+  { h: 35, s: 100, l: 30 },   // 6. Orange-yellow (8 point gap, full saturation)
+  { h: 30, s: 100, l: 24 },   // 7. Light orange (6 point gap, full saturation)
+  { h: 25, s: 100, l: 19 },   // 8. Orange (5 point gap, full saturation)
+  { h: 20, s: 100, l: 15 },   // 9. Dark orange (4 point gap, full saturation)
+  { h: 15, s: 100, l: 12 },   // 10. Brown-orange (3 point gap, full saturation)
+  { h: 10, s: 95, l: 10 },    // 11. Red-brown (2 point gap, more red)
+  { h: 5, s: 90, l: 8.5 },    // 12. Medium brown (1.5 point gap, redder)
+  { h: 0, s: 85, l: 7.5 },    // 13. Dark brown (1 point gap, red-brown)
+  { h: 355, s: 80, l: 6.5 },  // 14. Very dark brown (1 point gap, more red)
+  { h: 350, s: 75, l: 6 },    // 15. Almost black brown (0.5 point gap, red-brown)
   
-  // Mid-range colors with more variety and better distinction
-  { h: 20, s: 60, l: 11 },    // 16. Medium-dark brown
-  { h: 15, s: 65, l: 10 },    // 17. Red-brown
-  { h: 10, s: 70, l: 9 },     // 18. Rust brown
-  { h: 5, s: 75, l: 8 },      // 19. Brown-red
-  { h: 0, s: 70, l: 7 },      // 20. Reddish-brown
-  { h: 355, s: 75, l: 6.5 },  // 21. Dark red-orange
-  { h: 350, s: 80, l: 6 },    // 22. Dark red
-  { h: 345, s: 75, l: 5.5 },  // 23. Deep red
-  { h: 340, s: 80, l: 5 },    // 24. Rose-red
-  { h: 335, s: 75, l: 4.5 },  // 25. Dark rose
-  { h: 330, s: 85, l: 4 },    // 26. Pink-red
-  { h: 325, s: 80, l: 3.5 },  // 27. Deep pink
-  { h: 320, s: 90, l: 3 },    // 28. Magenta-red
-  { h: 315, s: 85, l: 2.5 },  // 29. Dark magenta-pink
-  { h: 310, s: 95, l: 2 },    // 30. Dark magenta
-  { h: 305, s: 90, l: 1.8 },  // 31. Deep magenta
-  { h: 300, s: 100, l: 1.5 }, // 32. Purple-magenta
-  { h: 295, s: 95, l: 1.3 },  // 33. Dark purple-magenta
-  { h: 290, s: 100, l: 1.1 }, // 34. Dark purple
-  { h: 285, s: 95, l: 0.9 },  // 35. Deep purple
-  { h: 280, s: 100, l: 0.7 }, // 36. Deep purple
-  { h: 275, s: 95, l: 0.6 },  // 37. Violet-purple
-  { h: 270, s: 100, l: 0.5 }, // 38. Violet
-  { h: 265, s: 95, l: 0.45 }, // 39. Blue-violet
-  { h: 260, s: 100, l: 0.4 }, // 40. Blue-violet
-  { h: 255, s: 95, l: 0.35 }, // 41. Deep blue-violet
-  { h: 250, s: 100, l: 0.3 }, // 42. Deep blue
-  { h: 245, s: 95, l: 0.25 }, // 43. Dark blue
-  { h: 240, s: 100, l: 0.2 }, // 44. Dark blue
-  { h: 235, s: 95, l: 0.18 }, // 45. Navy blue
-  { h: 230, s: 100, l: 0.15 },// 46. Navy blue
-  { h: 225, s: 95, l: 0.12 }, // 47. Very dark blue
-  { h: 220, s: 100, l: 0.1 }, // 48. Very dark blue
-  { h: 215, s: 95, l: 0.09 }, // 49. Almost black blue
-  { h: 210, s: 100, l: 0.08 },// 50. Almost black blue
-  { h: 205, s: 95, l: 0.07 }, // 51. Very dark cyan-blue
-  { h: 200, s: 100, l: 0.06 },// 52. Very dark cyan
-  { h: 195, s: 95, l: 0.055 },// 53. Very dark teal-cyan
-  { h: 190, s: 100, l: 0.05 },// 54. Very dark teal
-  { h: 185, s: 95, l: 0.045 },// 55. Very dark green-teal
-  { h: 180, s: 100, l: 0.04 },// 56. Very dark green-cyan
-  { h: 175, s: 95, l: 0.035 },// 57. Very dark green
-  { h: 170, s: 100, l: 0.03 },// 58. Very dark green
-  { h: 165, s: 95, l: 0.025 },// 59. Dark forest green
-  { h: 160, s: 100, l: 0.02 },// 60. Dark forest green
-  { h: 155, s: 95, l: 0.015 },// 61. Very dark green
-  { h: 150, s: 100, l: 0.01 },// 62. Very dark green
+  // Mid-range colors with COMPLETELY different hues and much larger gaps
+  { h: 340, s: 100, l: 5 },   // 16. Dark red (1 point gap, very red, full saturation)
+  { h: 320, s: 100, l: 4 },   // 17. Deep pink-red (1 point gap, pink hue, full saturation)
+  { h: 300, s: 100, l: 3.5 }, // 18. Magenta (0.5 point gap, magenta hue, full saturation)
+  { h: 280, s: 100, l: 3 },   // 19. Purple (0.5 point gap, purple hue, full saturation)
+  { h: 260, s: 100, l: 2.5 }, // 20. Blue-purple (0.5 point gap, blue-purple, full saturation)
+  { h: 240, s: 100, l: 2.2 }, // 21. Blue (0.3 point gap, blue hue, full saturation)
+  { h: 220, s: 100, l: 2 },   // 22. Cyan-blue (0.2 point gap, cyan-blue, full saturation)
+  { h: 200, s: 100, l: 1.8 }, // 23. Cyan (0.2 point gap, cyan hue, full saturation)
+  { h: 180, s: 100, l: 1.6 }, // 24. Teal (0.2 point gap, teal hue, full saturation)
+  { h: 160, s: 100, l: 1.4 }, // 25. Green-teal (0.2 point gap, green-teal, full saturation)
+  { h: 140, s: 100, l: 1.2 }, // 26. Green (0.2 point gap, green hue, full saturation)
+  { h: 120, s: 100, l: 1.0 }, // 27. Yellow-green (0.2 point gap, yellow-green, full saturation)
+  { h: 100, s: 100, l: 0.85 },// 28. Lime-green (0.15 point gap, lime, full saturation)
+  { h: 80, s: 100, l: 0.7 },  // 29. Yellow-lime (0.15 point gap, yellow-lime, full saturation)
+  { h: 60, s: 100, l: 0.6 },  // 30. Yellow (0.1 point gap, yellow, full saturation)
+  { h: 40, s: 100, l: 0.5 },  // 31. Orange-yellow (0.1 point gap, orange-yellow, full saturation)
+  { h: 20, s: 100, l: 0.42 }, // 32. Orange (0.08 point gap, orange, full saturation)
+  { h: 0, s: 100, l: 0.35 },  // 33. Red (0.07 point gap, red, full saturation)
+  { h: 340, s: 100, l: 0.3 }, // 34. Red-pink (0.05 point gap, red-pink, full saturation)
+  { h: 320, s: 100, l: 0.25 },// 35. Pink-magenta (0.05 point gap, pink-magenta, full saturation)
+  { h: 300, s: 100, l: 0.21 },// 36. Magenta (0.04 point gap, magenta, full saturation)
+  { h: 280, s: 100, l: 0.18 },// 37. Purple (0.03 point gap, purple, full saturation)
+  { h: 260, s: 100, l: 0.15 },// 38. Blue-purple (0.03 point gap, blue-purple, full saturation)
+  { h: 240, s: 100, l: 0.12 },// 39. Blue (0.03 point gap, blue, full saturation)
+  { h: 220, s: 100, l: 0.10 },// 40. Cyan-blue (0.02 point gap, cyan-blue, full saturation)
+  { h: 200, s: 100, l: 0.08 },// 41. Cyan (0.02 point gap, cyan, full saturation)
+  { h: 180, s: 100, l: 0.07 },// 42. Teal (0.01 point gap, teal, full saturation)
+  { h: 160, s: 100, l: 0.06 },// 43. Green-teal (0.01 point gap, green-teal, full saturation)
+  { h: 140, s: 100, l: 0.05 },// 44. Green (0.01 point gap, green, full saturation)
+  { h: 120, s: 100, l: 0.04 },// 45. Yellow-green (0.01 point gap, yellow-green, full saturation)
+  { h: 100, s: 100, l: 0.035 },// 46. Lime-green (0.005 point gap, lime, full saturation)
+  { h: 80, s: 100, l: 0.03 }, // 47. Yellow-lime (0.005 point gap, yellow-lime, full saturation)
+  { h: 60, s: 100, l: 0.025 },// 48. Yellow (0.005 point gap, yellow, full saturation)
+  { h: 40, s: 100, l: 0.02 }, // 49. Orange-yellow (0.005 point gap, orange-yellow, full saturation)
+  { h: 20, s: 100, l: 0.017 },// 50. Orange (0.003 point gap, orange, full saturation)
+  { h: 0, s: 100, l: 0.014 }, // 51. Red (0.003 point gap, red, full saturation)
+  { h: 340, s: 100, l: 0.012 },// 52. Red-pink (0.002 point gap, red-pink, full saturation)
+  { h: 320, s: 100, l: 0.01 },// 53. Pink-magenta (0.002 point gap, pink-magenta, full saturation)
+  { h: 300, s: 100, l: 0.008 },// 54. Magenta (0.002 point gap, magenta, full saturation)
+  { h: 280, s: 100, l: 0.007 },// 55. Purple (0.001 point gap, purple, full saturation)
+  { h: 260, s: 100, l: 0.006 },// 56. Blue-purple (0.001 point gap, blue-purple, full saturation)
+  { h: 240, s: 100, l: 0.005 },// 57. Blue (0.001 point gap, blue, full saturation)
+  { h: 220, s: 100, l: 0.004 },// 58. Cyan-blue (0.001 point gap, cyan-blue, full saturation)
+  { h: 200, s: 100, l: 0.003 },// 59. Cyan (0.001 point gap, cyan, full saturation)
+  { h: 180, s: 100, l: 0.0025 },// 60. Teal (0.0005 point gap, teal, full saturation)
+  { h: 160, s: 100, l: 0.002 },// 61. Green-teal (0.0005 point gap, green-teal, full saturation)
+  { h: 140, s: 100, l: 0.0015 },// 62. Green (0.0005 point gap, green, full saturation)
   
   // Final progression to black with larger steps (must be darker than previous)
   { h: 0, s: 0, l: 0 },       // 63. Black (pure black)
