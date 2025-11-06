@@ -93,9 +93,9 @@
   /* Scroll buttons - fixed position relative to wrapper viewport */
   .scroll-button {
     position: absolute;
-    right: 20px;
-    width: 44px;
-    height: 44px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.95);
     border: 2px solid rgba(0, 0, 0, 0.1);
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     color: #2c3e50;
     z-index: 10;
@@ -141,9 +141,9 @@
   @media (min-width: 769px) {
     .scroll-button {
       right: 10px;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
     }
     
     .scroll-button-up {

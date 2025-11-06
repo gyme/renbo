@@ -735,7 +735,14 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
         const totalPencilHeight = pencils.length * PENCIL_HEIGHT;
         const totalSpacing = Math.max(0, (pencils.length - 1) * PENCIL_SPACING);
         const topPadding = 40; // Top padding for buffer (prevents cropping at top)
-        const bottomPadding = 30; // Bottom padding for buffer and mobile navigation bar
+        
+        // Calculate bottom padding - account for mobile navigation bar on mobile devices
+        // Container has padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px) + 56px) on mobile
+        // We need extra padding in canvas height so last pencil can scroll above navigation bar
+        const isMobile = window.innerWidth <= 768;
+        const mobileNavBarHeight = isMobile ? 80 : 0; // Account for mobile nav bar + safe area
+        const bottomPadding = 30 + mobileNavBarHeight; // Base buffer + mobile navigation bar
+        
         const height = Math.max(200, totalPencilHeight + totalSpacing + topPadding + bottomPadding);
         
         setDimensions({ width, height });
