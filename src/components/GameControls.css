@@ -1,75 +1,15 @@
 .game-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
-  padding: 0;
+  padding: 20px;
+  gap: 20px;
 }
 
-.controls-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
-  gap: 12px;
-  width: 100%;
-  align-items: center;
-}
-
-.level-badge,
-.moves-badge {
-  background: white;
-  backdrop-filter: none;
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 70px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.level-badge:hover,
-.moves-badge:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 6px 25px rgba(0, 0, 0, 0.12),
-    0 3px 12px rgba(0, 0, 0, 0.06);
-}
-
-@keyframes badgeFloat {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-.badge-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #888;
-  font-weight: 600;
-  margin-bottom: 6px;
-  line-height: 1;
-}
-
-.badge-value {
-  font-size: 24px;
-  font-weight: 800;
-  color: #2c3e50;
-  line-height: 1;
-  text-shadow: none;
-}
 
 
 .btn-icon {
@@ -178,35 +118,6 @@
   transform: translateY(0px) scale(0.98);
 }
 
-.btn-done {
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
-  color: white;
-  padding: 0 32px;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  box-shadow: 
-    0 6px 20px rgba(255, 107, 53, 0.3),
-    0 3px 10px rgba(255, 107, 53, 0.2);
-  height: 70px;
-  border-radius: 20px;
-  animation: none;
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-done:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 
-    0 10px 30px rgba(255, 107, 53, 0.4),
-    0 5px 15px rgba(255, 107, 53, 0.3);
-  animation: none;
-}
-
-.btn-done:active {
-  transform: translateY(-1px) scale(0.98);
-}
 
 @keyframes doneButtonPulse {
   0%, 100% {
@@ -232,62 +143,25 @@
 
 @media (max-width: 768px) {
   .game-controls {
-    max-width: 400px;
-    padding: 0 16px;
+    padding: 15px;
+    gap: 15px;
   }
-  
-  .controls-grid {
-    grid-template-columns: 1fr 1fr 1.2fr;
-    gap: 8px;
+
+  .moves-indicator {
+    padding: 10px 16px;
+    min-width: 100px;
+  }
+
+  .moves-value {
+    font-size: 24px;
+  }
+
+  .moves-label {
+    font-size: 12px;
   }
 
   .btn-done {
-    height: 60px;
-    font-size: 14px;
-    padding: 0 16px;
-  }
-
-  .level-badge,
-  .moves-badge {
-    height: 60px;
-    padding: 8px 12px;
-  }
-
-  .badge-value {
-    font-size: 20px;
-  }
-
-  .badge-label {
-    font-size: 9px;
-  }
-}
-
-@media (max-width: 480px) {
-  .game-controls {
-    padding: 0 12px;
-  }
-  
-  .controls-grid {
-    gap: 6px;
-  }
-
-  .level-badge,
-  .moves-badge {
-    height: 55px;
-    padding: 6px 8px;
-  }
-
-  .badge-value {
-    font-size: 18px;
-  }
-
-  .badge-label {
-    font-size: 8px;
-  }
-
-  .btn-done {
-    height: 55px;
-    font-size: 13px;
-    padding: 0 12px;
+    padding: 14px 40px;
+    font-size: 16px;
   }
 }

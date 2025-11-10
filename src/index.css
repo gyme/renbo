@@ -21,22 +21,25 @@
 }
 
 html {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #root {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 button {
@@ -90,6 +93,24 @@ button:focus-visible {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Mobile: Lock overflow to prevent issues with viewport height and mobile browsers */
+@media (max-width: 768px) {
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  body {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  #root {
+    height: 100vh;
+    overflow: hidden;
+  }
 }
 
 /* Better rendering */

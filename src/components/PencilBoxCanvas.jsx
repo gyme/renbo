@@ -23,7 +23,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
   });
 
   const PENCIL_HEIGHT = 40;
-  const PENCIL_WIDTH = 300;
+  const PENCIL_WIDTH = 238; // tip (18) + body (200) + metal (4) + eraser (16)
   const PENCIL_SPACING = 0;
   const LOCK_ICON_SIZE = 32;
 
@@ -83,169 +83,163 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
     ctx.scale(scale, scale);
     ctx.translate(-PENCIL_WIDTH / 2, -PENCIL_HEIGHT / 2);
 
-    // Pencil body - simplified hexagonal shape
-    const bodyWidth = 270;
-    const bodyHeight = 24;
-    const bodyX = 30;
+    // Pencil dimensions matching the original design exactly
+    const bodyWidth = 200;
+    const bodyHeight = 16;
+    const bodyX = 18; // Tip starts earlier
     const bodyY = (PENCIL_HEIGHT - bodyHeight) / 2;
+    const tipLength = 18; // Longer tip
+    const eraserLength = 16; // Slightly shorter eraser
+    const metalBandWidth = 4; // Thin light gray band
+    const eraserHeight = bodyHeight - 3; // Slightly shorter than body
 
-    // Draw tip
+    // Calculate positions
+    const metalBandX = bodyX + bodyWidth;
+    const eraserX = metalBandX + metalBandWidth;
+    const eraserY = bodyY + 1.5; // Center vertically since it's shorter
+
+    // Draw sharpened wooden tip (left side) - tan/beige triangle
+    const woodTipGradient = ctx.createLinearGradient(0, bodyY, bodyX, bodyY);
+    woodTipGradient.addColorStop(0, '#C4A77D');
+    woodTipGradient.addColorStop(0.5, '#D9B991');
+    woodTipGradient.addColorStop(1, '#E8CBA8');
+    ctx.fillStyle = woodTipGradient;
     ctx.beginPath();
-    ctx.moveTo(10, PENCIL_HEIGHT / 2);
-    ctx.lineTo(bodyX, bodyY + 2);
-    ctx.lineTo(bodyX, bodyY + bodyHeight - 2);
+    ctx.moveTo(0, PENCIL_HEIGHT / 2); // Sharp point at center, starting from left edge
+    ctx.lineTo(bodyX, bodyY); // Top of body
+    ctx.lineTo(bodyX, bodyY + bodyHeight); // Bottom of body
     ctx.closePath();
-    ctx.fillStyle = '#8B6F47';
     ctx.fill();
-
-    // Core tip
+    
+    // Add wood grain lines on tip
+    ctx.strokeStyle = 'rgba(139, 111, 71, 0.3)';
+    ctx.lineWidth = 0.5;
     ctx.beginPath();
-    ctx.moveTo(10, PENCIL_HEIGHT / 2);
-    ctx.lineTo(20, bodyY + 7);
-    ctx.lineTo(20, bodyY + bodyHeight - 7);
-    ctx.closePath();
-    ctx.fillStyle = adjustColor(color, 10);
-    ctx.fill();
+    ctx.moveTo(6, PENCIL_HEIGHT / 2 - 2);
+    ctx.lineTo(bodyX - 2, bodyY + 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(8, PENCIL_HEIGHT / 2);
+    ctx.lineTo(bodyX - 1, bodyY + bodyHeight / 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(6, PENCIL_HEIGHT / 2 + 2);
+    ctx.lineTo(bodyX - 2, bodyY + bodyHeight - 2);
+    ctx.stroke();
 
-    // Main body - top facet (lightest)
-    ctx.fillStyle = adjustColor(color, 40);
-    ctx.fillRect(bodyX, bodyY, bodyWidth, 6);
-
-    // White highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.fillRect(bodyX, bodyY, bodyWidth, 2);
-
-    // Middle facets
-    ctx.fillStyle = adjustColor(color, 20);
-    ctx.fillRect(bodyX, bodyY + 6, bodyWidth, 6);
-
+    // Main colored body - simple rectangle
     ctx.fillStyle = color;
-    ctx.fillRect(bodyX, bodyY + 12, bodyWidth, 6);
+    ctx.fillRect(bodyX, bodyY, bodyWidth, bodyHeight);
 
-    // Bottom facet (darkest)
-    ctx.fillStyle = adjustColor(color, -30);
-    ctx.fillRect(bodyX, bodyY + 18, bodyWidth, 6);
+    // Thin light gray metal band (ferrule) - simple rectangle
+    ctx.fillStyle = '#C8D0D8'; // Light gray/silver
+    ctx.fillRect(metalBandX, bodyY, metalBandWidth, bodyHeight);
 
-    // End cap
-    const capX = bodyX + bodyWidth;
-    ctx.fillStyle = adjustColor(color, -40);
+    // Pink/red eraser - simple rectangle, slightly shorter than body
+    const eraserGradient = ctx.createLinearGradient(eraserX, eraserY, eraserX + eraserLength, eraserY);
+    eraserGradient.addColorStop(0, '#E76F7C');
+    eraserGradient.addColorStop(0.5, '#D95B6B');
+    eraserGradient.addColorStop(1, '#C74A5A');
+    ctx.fillStyle = eraserGradient;
+    ctx.fillRect(eraserX, eraserY, eraserLength, eraserHeight);
+
+    // Continuous black outline around entire pencil
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(capX, bodyY + 2);
-    ctx.lineTo(capX + 6, bodyY + 6);
-    ctx.lineTo(capX + 6, bodyY + bodyHeight - 6);
-    ctx.lineTo(capX, bodyY + bodyHeight - 2);
+    // Start from tip
+    ctx.moveTo(0, PENCIL_HEIGHT / 2);
+    // Tip to body top
+    ctx.lineTo(bodyX, bodyY);
+    // Body top edge
+    ctx.lineTo(metalBandX, bodyY);
+    // Metal band top edge
+    ctx.lineTo(eraserX, eraserY);
+    // Eraser top edge
+    ctx.lineTo(eraserX + eraserLength, eraserY);
+    // Eraser right edge
+    ctx.lineTo(eraserX + eraserLength, eraserY + eraserHeight);
+    // Eraser bottom edge
+    ctx.lineTo(eraserX, eraserY + eraserHeight);
+    // Metal band bottom edge
+    ctx.lineTo(metalBandX, bodyY + bodyHeight);
+    // Body bottom edge
+    ctx.lineTo(bodyX, bodyY + bodyHeight);
+    // Body to tip
+    ctx.lineTo(0, PENCIL_HEIGHT / 2);
     ctx.closePath();
-    ctx.fill();
+    ctx.stroke();
 
-    // Inner shadow on cap
-    ctx.fillStyle = adjustColor(color, -50);
-    ctx.globalAlpha = opacity * 0.6;
-    ctx.beginPath();
-    ctx.ellipse(capX + 3, PENCIL_HEIGHT / 2, 2, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.globalAlpha = opacity;
-
-    // Lock indicator for fixed pencil
+    // Lock symbol for fixed pencil - white circle with black outline padlock (centered on body)
     if (isFixed) {
+      // Reset shadow for lock
       ctx.shadowBlur = 0;
       ctx.shadowOffsetY = 0;
+      ctx.shadowColor = 'transparent';
       
-      // Add a subtle overlay to darken the pencil slightly
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-      ctx.fillRect(x, y, PENCIL_WIDTH, PENCIL_HEIGHT);
+      // Lock position - centered on pencil body (absolute positioning)
+      const lockCenterX = bodyX + bodyWidth / 2;
+      const lockCenterY = PENCIL_HEIGHT / 2;
+      const circleRadius = 14;
+      const lockWidth = 10;
+      const lockHeight = 10;
       
-      // Add a modern border with rounded corners
-      ctx.strokeStyle = 'rgba(255, 193, 7, 0.9)'; // Amber border
-      ctx.lineWidth = 3;
+      // White circle background with black outline
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(lockCenterX, lockCenterY, circleRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(lockCenterX, lockCenterY, circleRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Lock icon - black filled padlock
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
-      // Draw rounded rectangle border
-      const borderPadding = 2;
-      const cornerRadius = 8;
-      const rectX = x + borderPadding;
-      const rectY = y + borderPadding;
-      const rectWidth = PENCIL_WIDTH - borderPadding * 2;
-      const rectHeight = PENCIL_HEIGHT - borderPadding * 2;
+      // Lock body (rectangle)
+      const lockBodyX = lockCenterX - lockWidth / 2;
+      const lockBodyY = lockCenterY - lockHeight / 2 + 2;
+      const lockBodyWidth = lockWidth;
+      const lockBodyHeight = lockHeight - 3;
       
+      // Draw lock body with rounded corners
+      const cornerRadius = 1.5;
       ctx.beginPath();
-      ctx.moveTo(rectX + cornerRadius, rectY);
-      ctx.lineTo(rectX + rectWidth - cornerRadius, rectY);
-      ctx.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + cornerRadius);
-      ctx.lineTo(rectX + rectWidth, rectY + rectHeight - cornerRadius);
-      ctx.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - cornerRadius, rectY + rectHeight);
-      ctx.lineTo(rectX + cornerRadius, rectY + rectHeight);
-      ctx.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - cornerRadius);
-      ctx.lineTo(rectX, rectY + cornerRadius);
-      ctx.quadraticCurveTo(rectX, rectY, rectX + cornerRadius, rectY);
-      ctx.closePath();
-      ctx.stroke();
-      
-      // Add a modern "LOCKED" badge in the top-right corner
-      const badgeX = x + PENCIL_WIDTH - 60;
-      const badgeY = y + 8;
-      const badgeWidth = 50;
-      const badgeHeight = 16;
-      
-      // Badge background with gradient effect
-      const gradient = ctx.createLinearGradient(badgeX, badgeY, badgeX, badgeY + badgeHeight);
-      gradient.addColorStop(0, 'rgba(255, 193, 7, 0.95)');
-      gradient.addColorStop(1, 'rgba(255, 152, 0, 0.95)');
-      
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.moveTo(badgeX + 8, badgeY);
-      ctx.lineTo(badgeX + badgeWidth - 8, badgeY);
-      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + 8);
-      ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - 8);
-      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - 8, badgeY + badgeHeight);
-      ctx.lineTo(badgeX + 8, badgeY + badgeHeight);
-      ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - 8);
-      ctx.lineTo(badgeX, badgeY + 8);
-      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + 8, badgeY);
+      ctx.moveTo(lockBodyX + cornerRadius, lockBodyY);
+      ctx.lineTo(lockBodyX + lockBodyWidth - cornerRadius, lockBodyY);
+      ctx.arcTo(lockBodyX + lockBodyWidth, lockBodyY, lockBodyX + lockBodyWidth, lockBodyY + cornerRadius, cornerRadius);
+      ctx.lineTo(lockBodyX + lockBodyWidth, lockBodyY + lockBodyHeight - cornerRadius);
+      ctx.arcTo(lockBodyX + lockBodyWidth, lockBodyY + lockBodyHeight, lockBodyX + lockBodyWidth - cornerRadius, lockBodyY + lockBodyHeight, cornerRadius);
+      ctx.lineTo(lockBodyX + cornerRadius, lockBodyY + lockBodyHeight);
+      ctx.arcTo(lockBodyX, lockBodyY + lockBodyHeight, lockBodyX, lockBodyY + lockBodyHeight - cornerRadius, cornerRadius);
+      ctx.lineTo(lockBodyX, lockBodyY + cornerRadius);
+      ctx.arcTo(lockBodyX, lockBodyY, lockBodyX + cornerRadius, lockBodyY, cornerRadius);
       ctx.closePath();
       ctx.fill();
-      
-      // Badge border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(badgeX + 8, badgeY);
-      ctx.lineTo(badgeX + badgeWidth - 8, badgeY);
-      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY, badgeX + badgeWidth, badgeY + 8);
-      ctx.lineTo(badgeX + badgeWidth, badgeY + badgeHeight - 8);
-      ctx.quadraticCurveTo(badgeX + badgeWidth, badgeY + badgeHeight, badgeX + badgeWidth - 8, badgeY + badgeHeight);
-      ctx.lineTo(badgeX + 8, badgeY + badgeHeight);
-      ctx.quadraticCurveTo(badgeX, badgeY + badgeHeight, badgeX, badgeY + badgeHeight - 8);
-      ctx.lineTo(badgeX, badgeY + 8);
-      ctx.quadraticCurveTo(badgeX, badgeY, badgeX + 8, badgeY);
-      ctx.closePath();
       ctx.stroke();
       
-      // "LOCKED" text on badge
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-      ctx.font = 'bold 9px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('LOCKED', badgeX + badgeWidth / 2, badgeY + badgeHeight / 2);
+      // Lock shackle (U-shape on top)
+      const shackleWidth = 6;
+      const shackleHeight = 4;
+      const shackleX = lockCenterX - shackleWidth / 2;
+      const shackleY = lockBodyY - shackleHeight;
       
-      // Add a subtle diagonal stripe pattern
-      ctx.strokeStyle = 'rgba(255, 193, 7, 0.3)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const startX = x + (i * 15);
-        const startY = y + PENCIL_HEIGHT;
-        const endX = x + (i * 15) + 20;
-        const endY = y;
-        
-        if (endX < x + PENCIL_WIDTH) {
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(endX, endY);
-          ctx.stroke();
-        }
-      }
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(shackleX, lockBodyY);
+      ctx.lineTo(shackleX, shackleY + 1);
+      ctx.arcTo(shackleX, shackleY - 1, shackleX + shackleWidth / 2, shackleY - 1, 2);
+      ctx.arcTo(shackleX + shackleWidth, shackleY - 1, shackleX + shackleWidth, shackleY + 1, 2);
+      ctx.lineTo(shackleX + shackleWidth, lockBodyY);
+      ctx.stroke();
     }
 
     ctx.restore();
@@ -289,7 +283,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
 
       // Draw all pencils
       pencils.forEach((pencil, index) => {
-        const isFixed = index === pencils.length - 1;
+        const isFixed = index === pencils.length - 1; // Last pencil is always fixed/locked
         const isDragging = index === state.draggedIndex;
         
         let drawX, drawY, opacity;
@@ -306,6 +300,7 @@ export default function PencilBoxCanvas({ pencils, onPencilsReorder, disabled = 
           opacity = 1;
         }
         
+        // Always draw the pencil, including the lock if it's fixed
         drawPencil(ctx, drawX, drawY, pencil.color, isFixed, isDragging, opacity);
       });
 

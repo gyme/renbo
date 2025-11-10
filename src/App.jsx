@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import PencilBoxCanvas from './components/PencilBoxCanvas';
 import ScoreModal from './components/ScoreModal';
 import Leaderboard from './components/Leaderboard';
 import GameControls from './components/GameControls';
 import InstructionsModal from './components/InstructionsModal';
+import LevelMap from './components/LevelMap';
+import Menu from './components/Menu';
 import { generatePencils, sortPencils } from './utils/colorUtils';
 import { calculateScore, calculatePercentile } from './utils/scoreUtils';
 import { saveScore, getLeaderboard, saveCurrentLevel, getCurrentLevel } from './utils/storageUtils';
@@ -15,10 +18,21 @@ function App() {
   const [idealOrder, setIdealOrder] = useState([]);
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showLevelMap, setShowLevelMap] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [currentScore, setCurrentScore] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [movesLeft, setMovesLeft] = useState(null);
   const prevMovesLeftRef = useRef(null);
+
+  // Initialize max unlocked level on first load
+  useEffect(() => {
+    const maxUnlocked = localStorage.getItem('maxUnlockedLevel');
+    if (!maxUnlocked) {
+      localStorage.setItem('maxUnlockedLevel', level.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   // Initialize game
   useEffect(() => {
@@ -33,6 +47,12 @@ function App() {
   // Save level to localStorage whenever it changes
   useEffect(() => {
     saveCurrentLevel(level);
+    
+    // Update max unlocked level
+    const currentMax = parseInt(localStorage.getItem('maxUnlockedLevel') || '1', 10);
+    if (level > currentMax) {
+      localStorage.setItem('maxUnlockedLevel', level.toString());
+    }
   }, [level]);
 
   // Auto-submit when moves reach 0 (only if it went from > 0 to 0, not initial load)
@@ -132,7 +152,15 @@ function App() {
 
   function handleNextLevel() {
     // Infinite levels!
-    setLevel(level + 1);
+    const nextLevel = level + 1;
+    setLevel(nextLevel);
+    
+    // Update max unlocked level
+    const currentMax = parseInt(localStorage.getItem('maxUnlockedLevel') || '1', 10);
+    if (nextLevel > currentMax) {
+      localStorage.setItem('maxUnlockedLevel', nextLevel.toString());
+    }
+    
     setShowScoreModal(false);
   }
 
@@ -141,30 +169,62 @@ function App() {
     initializeLevel(level);
   }
 
+  function handleSelectLevel(selectedLevel) {
+    setLevel(selectedLevel);
+    setShowLevelMap(false);
+  }
+
+  function handleOpenLevelMap() {
+    setShowLevelMap(true);
+    setShowMenu(false);
+  }
+
   return (
     <div className="app">
       <header className="app-header">
+        <div className="header-spacer"></div>
+        
         <div className="logo-section">
-          <img src="/renbo-logo.png" alt="Renbo" className="app-logo" 
-               onError={(e) => {e.target.style.display = 'none'; e.target.parentElement.innerHTML += '<div style="font-size:56px;font-weight:800;background:linear-gradient(90deg,#FF5722 0%,#FFD600 25%,#FFD600 50%,#4CAF50 75%,#2196F3 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:3px 3px 6px rgba(0,0,0,0.3)">Renbo</div>';}} />
+          <img src="/renbo-logo.svg" alt="Renbo" className="renbo-logo-img" />
         </div>
         
-        <GameControls
-          level={level}
-          movesLeft={movesLeft}
-          onSubmit={handleSubmit}
-          onReset={handleReset}
-          onShowInstructions={() => setShowInstructions(true)}
-        />
+        <motion.button 
+          className="hamburger-button"
+          onClick={() => setShowMenu(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </motion.button>
       </header>
 
       <main className="app-main">
+        <div className="moves-section">
+          <div className="moves-indicator">
+            <span className="moves-label">Moves left</span>
+            <span className="moves-value">{movesLeft ?? 0}</span>
+          </div>
+        </div>
+        
         <div className="game-section">
           <PencilBoxCanvas
             pencils={pencils}
             onPencilsReorder={handlePencilsReorder}
             disabled={showScoreModal}
           />
+        </div>
+
+        <div className="done-button-section">
+          <motion.button
+            className="btn-done"
+            onClick={handleSubmit}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Done
+          </motion.button>
         </div>
       </main>
 
@@ -184,6 +244,23 @@ function App() {
       <InstructionsModal
         isOpen={showInstructions}
         onClose={() => setShowInstructions(false)}
+      />
+
+      <AnimatePresence>
+        {showLevelMap && (
+          <LevelMap
+            currentLevel={level}
+            onSelectLevel={handleSelectLevel}
+            onClose={() => setShowLevelMap(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <Menu
+        isOpen={showMenu}
+        onClose={() => setShowMenu(false)}
+        onOpenLevelMap={handleOpenLevelMap}
+        currentLevel={level}
       />
 
     </div>

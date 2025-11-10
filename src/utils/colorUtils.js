@@ -1,98 +1,100 @@
 // Utility functions for color generation and sorting
 
 /**
- * Predefined color palette - consistent across all games
- * Progresses from light to dark with increased contrast for better distinction
- * Each color has significantly more difference from adjacent colors
+ * Predefined color palette - intuitive progression from light to dark
+ * Uses consistent hue (same color family) with decreasing lightness for easier solving
+ * Players just need to arrange from lightest to darkest within the same color spectrum
  */
 const COLOR_PALETTE = [
-  // Light colors with EXTREME gaps and completely different hues for maximum distinction
-  { h: 0, s: 0, l: 100 },     // 1. Pure white
-  { h: 0, s: 0, l: 75 },      // 2. Medium gray (25 point gap - very distinct)
-  { h: 50, s: 60, l: 60 },    // 3. Light cream (15 point gap, yellow hue)
-  { h: 45, s: 100, l: 48 },   // 4. Bright yellow (12 point gap, full saturation)
-  { h: 40, s: 100, l: 38 },   // 5. Golden yellow (10 point gap, full saturation)
-  { h: 35, s: 100, l: 30 },   // 6. Orange-yellow (8 point gap, full saturation)
-  { h: 30, s: 100, l: 24 },   // 7. Light orange (6 point gap, full saturation)
-  { h: 25, s: 100, l: 19 },   // 8. Orange (5 point gap, full saturation)
-  { h: 20, s: 100, l: 15 },   // 9. Dark orange (4 point gap, full saturation)
-  { h: 15, s: 100, l: 12 },   // 10. Brown-orange (3 point gap, full saturation)
-  { h: 10, s: 95, l: 10 },    // 11. Red-brown (2 point gap, more red)
-  { h: 5, s: 90, l: 8.5 },    // 12. Medium brown (1.5 point gap, redder)
-  { h: 0, s: 85, l: 7.5 },    // 13. Dark brown (1 point gap, red-brown)
-  { h: 355, s: 80, l: 6.5 },  // 14. Very dark brown (1 point gap, more red)
-  { h: 350, s: 75, l: 6 },    // 15. Almost black brown (0.5 point gap, red-brown)
+  // Very light (90-80% lightness) - clearly the lightest
+  { h: 30, s: 90, l: 92 },    // 1. Very pale peach
+  { h: 30, s: 90, l: 88 },    // 2. Pale peach
+  { h: 30, s: 90, l: 84 },    // 3. Light peach
+  { h: 30, s: 90, l: 80 },    // 4. Soft peach
+  { h: 30, s: 90, l: 76 },    // 5. Light orange-pink
   
-  // Mid-range colors with COMPLETELY different hues and much larger gaps
-  { h: 340, s: 100, l: 5 },   // 16. Dark red (1 point gap, very red, full saturation)
-  { h: 320, s: 100, l: 4 },   // 17. Deep pink-red (1 point gap, pink hue, full saturation)
-  { h: 300, s: 100, l: 3.5 }, // 18. Magenta (0.5 point gap, magenta hue, full saturation)
-  { h: 280, s: 100, l: 3 },   // 19. Purple (0.5 point gap, purple hue, full saturation)
-  { h: 260, s: 100, l: 2.5 }, // 20. Blue-purple (0.5 point gap, blue-purple, full saturation)
-  { h: 240, s: 100, l: 2.2 }, // 21. Blue (0.3 point gap, blue hue, full saturation)
-  { h: 220, s: 100, l: 2 },   // 22. Cyan-blue (0.2 point gap, cyan-blue, full saturation)
-  { h: 200, s: 100, l: 1.8 }, // 23. Cyan (0.2 point gap, cyan hue, full saturation)
-  { h: 180, s: 100, l: 1.6 }, // 24. Teal (0.2 point gap, teal hue, full saturation)
-  { h: 160, s: 100, l: 1.4 }, // 25. Green-teal (0.2 point gap, green-teal, full saturation)
-  { h: 140, s: 100, l: 1.2 }, // 26. Green (0.2 point gap, green hue, full saturation)
-  { h: 120, s: 100, l: 1.0 }, // 27. Yellow-green (0.2 point gap, yellow-green, full saturation)
-  { h: 100, s: 100, l: 0.85 },// 28. Lime-green (0.15 point gap, lime, full saturation)
-  { h: 80, s: 100, l: 0.7 },  // 29. Yellow-lime (0.15 point gap, yellow-lime, full saturation)
-  { h: 60, s: 100, l: 0.6 },  // 30. Yellow (0.1 point gap, yellow, full saturation)
-  { h: 40, s: 100, l: 0.5 },  // 31. Orange-yellow (0.1 point gap, orange-yellow, full saturation)
-  { h: 20, s: 100, l: 0.42 }, // 32. Orange (0.08 point gap, orange, full saturation)
-  { h: 0, s: 100, l: 0.35 },  // 33. Red (0.07 point gap, red, full saturation)
-  { h: 340, s: 100, l: 0.3 }, // 34. Red-pink (0.05 point gap, red-pink, full saturation)
-  { h: 320, s: 100, l: 0.25 },// 35. Pink-magenta (0.05 point gap, pink-magenta, full saturation)
-  { h: 300, s: 100, l: 0.21 },// 36. Magenta (0.04 point gap, magenta, full saturation)
-  { h: 280, s: 100, l: 0.18 },// 37. Purple (0.03 point gap, purple, full saturation)
-  { h: 260, s: 100, l: 0.15 },// 38. Blue-purple (0.03 point gap, blue-purple, full saturation)
-  { h: 240, s: 100, l: 0.12 },// 39. Blue (0.03 point gap, blue, full saturation)
-  { h: 220, s: 100, l: 0.10 },// 40. Cyan-blue (0.02 point gap, cyan-blue, full saturation)
-  { h: 200, s: 100, l: 0.08 },// 41. Cyan (0.02 point gap, cyan, full saturation)
-  { h: 180, s: 100, l: 0.07 },// 42. Teal (0.01 point gap, teal, full saturation)
-  { h: 160, s: 100, l: 0.06 },// 43. Green-teal (0.01 point gap, green-teal, full saturation)
-  { h: 140, s: 100, l: 0.05 },// 44. Green (0.01 point gap, green, full saturation)
-  { h: 120, s: 100, l: 0.04 },// 45. Yellow-green (0.01 point gap, yellow-green, full saturation)
-  { h: 100, s: 100, l: 0.035 },// 46. Lime-green (0.005 point gap, lime, full saturation)
-  { h: 80, s: 100, l: 0.03 }, // 47. Yellow-lime (0.005 point gap, yellow-lime, full saturation)
-  { h: 60, s: 100, l: 0.025 },// 48. Yellow (0.005 point gap, yellow, full saturation)
-  { h: 40, s: 100, l: 0.02 }, // 49. Orange-yellow (0.005 point gap, orange-yellow, full saturation)
-  { h: 20, s: 100, l: 0.017 },// 50. Orange (0.003 point gap, orange, full saturation)
-  { h: 0, s: 100, l: 0.014 }, // 51. Red (0.003 point gap, red, full saturation)
-  { h: 340, s: 100, l: 0.012 },// 52. Red-pink (0.002 point gap, red-pink, full saturation)
-  { h: 320, s: 100, l: 0.01 },// 53. Pink-magenta (0.002 point gap, pink-magenta, full saturation)
-  { h: 300, s: 100, l: 0.008 },// 54. Magenta (0.002 point gap, magenta, full saturation)
-  { h: 280, s: 100, l: 0.007 },// 55. Purple (0.001 point gap, purple, full saturation)
-  { h: 260, s: 100, l: 0.006 },// 56. Blue-purple (0.001 point gap, blue-purple, full saturation)
-  { h: 240, s: 100, l: 0.005 },// 57. Blue (0.001 point gap, blue, full saturation)
-  { h: 220, s: 100, l: 0.004 },// 58. Cyan-blue (0.001 point gap, cyan-blue, full saturation)
-  { h: 200, s: 100, l: 0.003 },// 59. Cyan (0.001 point gap, cyan, full saturation)
-  { h: 180, s: 100, l: 0.0025 },// 60. Teal (0.0005 point gap, teal, full saturation)
-  { h: 160, s: 100, l: 0.002 },// 61. Green-teal (0.0005 point gap, green-teal, full saturation)
-  { h: 140, s: 100, l: 0.0015 },// 62. Green (0.0005 point gap, green, full saturation)
+  // Light (75-60% lightness)
+  { h: 30, s: 90, l: 72 },    // 6. Medium light orange
+  { h: 30, s: 95, l: 68 },    // 7. Light orange
+  { h: 30, s: 95, l: 64 },    // 8. Soft orange
+  { h: 30, s: 95, l: 60 },    // 9. Medium orange
+  { h: 30, s: 95, l: 56 },    // 10. Orange
   
-  // Final progression to black with larger steps (must be darker than previous)
-  { h: 0, s: 0, l: 0 },       // 63. Black (pure black)
+  // Medium (55-40% lightness)
+  { h: 30, s: 98, l: 52 },    // 11. Bright orange
+  { h: 30, s: 98, l: 48 },    // 12. Deep orange
+  { h: 30, s: 98, l: 44 },    // 13. Rich orange
+  { h: 30, s: 98, l: 40 },    // 14. Dark orange
+  { h: 30, s: 100, l: 36 },   // 15. Deep orange-brown
+  
+  // Medium-dark (35-25% lightness)
+  { h: 30, s: 100, l: 32 },   // 16. Brown-orange
+  { h: 30, s: 100, l: 28 },   // 17. Dark brown-orange
+  { h: 25, s: 100, l: 25 },   // 18. Reddish brown
+  { h: 25, s: 100, l: 22 },   // 19. Dark reddish brown
+  { h: 20, s: 100, l: 20 },   // 20. Deep brown
+  
+  // Dark (20-12% lightness)
+  { h: 20, s: 100, l: 18 },   // 21. Very dark brown
+  { h: 15, s: 100, l: 16 },   // 22. Darker brown
+  { h: 15, s: 100, l: 14 },   // 23. Deep dark brown
+  { h: 10, s: 100, l: 12 },   // 24. Nearly black brown
+  { h: 10, s: 100, l: 10 },   // 25. Very dark brown
+  
+  // Very dark (10-5% lightness)
+  { h: 5, s: 100, l: 9 },     // 26. Almost black brown
+  { h: 5, s: 90, l: 8 },      // 27. Near black
+  { h: 0, s: 80, l: 7 },      // 28. Very near black
+  { h: 0, s: 60, l: 6 },      // 29. Extremely dark
+  { h: 0, s: 40, l: 5 },      // 30. Nearly black
+  
+  // Extra levels - slightly different hue progression
+  { h: 35, s: 95, l: 90 },    // 31. Light coral
+  { h: 35, s: 95, l: 82 },    // 32. Soft coral
+  { h: 35, s: 95, l: 74 },    // 33. Medium coral
+  { h: 35, s: 98, l: 66 },    // 34. Coral
+  { h: 35, s: 98, l: 58 },    // 35. Deep coral
+  { h: 35, s: 100, l: 50 },   // 36. Rich coral
+  { h: 35, s: 100, l: 42 },   // 37. Dark coral
+  { h: 35, s: 100, l: 34 },   // 38. Deep brown-coral
+  { h: 32, s: 100, l: 26 },   // 39. Very dark coral
+  { h: 30, s: 100, l: 18 },   // 40. Nearly black coral
+  
+  // Extra levels continue
+  { h: 40, s: 95, l: 88 },    // 41. Light amber
+  { h: 40, s: 95, l: 78 },    // 42. Soft amber
+  { h: 40, s: 98, l: 68 },    // 43. Medium amber
+  { h: 40, s: 98, l: 58 },    // 44. Amber
+  { h: 40, s: 100, l: 48 },   // 45. Deep amber
+  { h: 40, s: 100, l: 38 },   // 46. Dark amber
+  { h: 38, s: 100, l: 28 },   // 47. Very dark amber
+  { h: 35, s: 100, l: 20 },   // 48. Nearly black amber
+  { h: 30, s: 100, l: 15 },   // 49. Extremely dark
+  { h: 25, s: 100, l: 12 },   // 50. Almost black
 ];
 
 /**
  * Generate a dynamic color for levels beyond the base palette
- * Creates colors that maintain the light-to-dark progression
+ * Maintains consistent progression with slight hue variations
  * @param {number} index - Color index (0-based)
  * @returns {Object} HSL color object
  */
 function generateDynamicColor(index) {
-  // For very high levels, generate colors in cycles
-  const cycleLength = 20;
+  // For very high levels, we continue the pattern with slight hue shifts
+  const baseHue = 30; // Orange base
+  const cycleLength = 10;
   const cycle = Math.floor(index / cycleLength);
   const positionInCycle = index % cycleLength;
   
-  // Create a more contrasted progression from light to dark
-  // Use larger steps to ensure better distinction (increased from 5.5 to 7)
-  const lightness = Math.max(2, 95 - (positionInCycle * 7));
-  const hue = (cycle * 60 + positionInCycle * 20) % 360; // Rotate through hue spectrum with larger steps (18->20)
-  const saturation = Math.min(100, 40 + positionInCycle * 4); // Increase saturation more (30->40, 3.5->4)
+  // Shift hue slightly for each cycle to add variety while keeping it logical
+  // Stay in warm colors (orange/red/brown spectrum)
+  const hue = baseHue + (cycle * 10) % 40; // Oscillates between 30-70 (orange to yellow-orange)
+  
+  // Create clear progression from light (92%) to dark (10%) within each cycle
+  const lightness = Math.max(10, 92 - (positionInCycle * 8.2));
+  
+  // Keep high saturation for vibrant colors
+  const saturation = Math.min(100, 85 + positionInCycle);
   
   return { h: hue, s: saturation, l: lightness };
 }
