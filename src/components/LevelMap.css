@@ -240,8 +240,8 @@
 
 /* Footer */
 .level-map-footer {
-  padding: 20px 24px 30px;
-  padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  padding: 20px 24px;
+  padding-bottom: calc(60px + env(safe-area-inset-bottom, 20px));
   border-top: 2px solid #E5DFD0;
   flex-shrink: 0;
 }
